@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Навчальний калькулятор з дисципліни "Страхування"</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 24px auto;
+      padding: 20px;
+    }
+
+    .hero, .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 14px;
+      border-left: 5px solid #1d4ed8;
+      padding-left: 10px;
+      color: #0f172a;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    .subtitle {
+      color: #4b5563;
+      margin: 0;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .tab-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .tab-btn.active {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .input-grid-2,
+    .input-grid-3,
+    .input-grid-4 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .input-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .input-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .input-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fff;
+      color: #111827;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button.action {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .warning {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #fdba74;
+      background: #fff7ed;
+      color: #9a3412;
+    }
+
+    .result-box {
+      margin-top: 16px;
+      background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .answer-box {
+      margin-top: 16px;
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .answer-main {
+      font-size: 24px;
+      font-weight: 700;
+      color: #155e75;
+    }
+
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #2563eb;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 10px 0;
+      font-family: "Courier New", monospace;
+      white-space: pre-line;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .compare-card {
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      padding: 18px;
+      background: #f9fbff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .compare-result {
+      font-size: 30px;
+      font-weight: 700;
+      margin: 10px 0 12px;
+      color: #1e3a8a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eff6ff;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #1d4ed8;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .step-body {
+      flex: 1;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    @media (max-width: 900px) {
+      .input-grid-2,
+      .input-grid-3,
+      .input-grid-4,
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 { font-size: 28px; }
+      h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Навчальний калькулятор з дисципліни "Страхування"</h1>
+      <p class="subtitle">
+        Сторінка для розрахункових задач: страховий платіж, страхове відшкодування, франшиза,
+        страхові резерви та автострахування.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="premiumTab">Страховий платіж</button>
+        <button class="tab-btn" data-tab="indemnityTab">Страхове відшкодування</button>
+        <button class="tab-btn" data-tab="franchiseTab">Франшиза</button>
+        <button class="tab-btn" data-tab="reserveTab">Страхові резерви</button>
+        <button class="tab-btn" data-tab="autoTab">Автострахування</button>
+      </div>
+
+      <!-- Страховий платіж -->
+      <div class="tab-content active" id="premiumTab">
+        <h2>Страховий платіж</h2>
+
+        <div class="input-grid-4">
+          <div>
+            <label for="premiumSum">Страхова сума, грн</label>
+            <input type="number" id="premiumSum" placeholder="Наприклад: 100000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="premiumTariff">Тариф, %</label>
+            <input type="number" id="premiumTariff" placeholder="Наприклад: 3.5" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="premiumDiscount">Знижка, %</label>
+            <input type="number" id="premiumDiscount" placeholder="Наприклад: 10" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="premiumBM">Коефіцієнт бонус-малус</label>
+            <input type="number" id="premiumBM" value="1" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="premiumLoading">Навантаження до нетто, %</label>
+            <input type="number" id="premiumLoading" placeholder="Наприклад: 20" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" onclick="calculatePremium()">Розрахувати</button>
+          <button class="action secondary" onclick="resetPremium()">Очистити</button>
+        </div>
+
+        <div id="premiumWarning" class="warning"></div>
+
+        <div class="result-box" id="premiumResult">
+          <p class="muted">Після розрахунку тут з’явиться покрокове пояснення.</p>
+        </div>
+      </div>
+
+      <!-- Страхове відшкодування -->
+      <div class="tab-content" id="indemnityTab">
+        <h2>Страхове відшкодування</h2>
+
+        <div class="input-grid-4">
+          <div>
+            <label for="indObjectValue">Вартість об'єкта, грн</label>
+            <input type="number" id="indObjectValue" placeholder="Наприклад: 26000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="indInsuredSum">Страхова сума, грн</label>
+            <input type="number" id="indInsuredSum" placeholder="Наприклад: 22000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="indLoss">Збиток, грн</label>
+            <input type="number" id="indLoss" placeholder="Наприклад: 25000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="indFranchise">Франшиза, грн</label>
+            <input type="number" id="indFranchise" value="0" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="indFranchiseType">Тип франшизи</label>
+            <select id="indFranchiseType">
+              <option value="none">Без франшизи</option>
+              <option value="conditional">Умовна франшиза</option>
+              <option value="unconditional">Безумовна франшиза</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" onclick="calculateIndemnity()">Розрахувати</button>
+          <button class="action secondary" onclick="resetIndemnity()">Очистити</button>
+        </div>
+
+        <div id="indWarning" class="warning"></div>
+
+        <div class="compare-grid" style="margin-top:16px;">
+          <div class="compare-card">
+            <div class="badge">Перший ризик</div>
+            <div class="compare-result" id="indFirstRiskValue">—</div>
+            <p id="indFirstRiskText" class="muted">Після розрахунку тут з’явиться пояснення.</p>
+          </div>
+          <div class="compare-card">
+            <div class="badge">Пропорційна відповідальність</div>
+            <div class="compare-result" id="indPropValue">—</div>
+            <p id="indPropText" class="muted">Після розрахунку тут з’явиться пояснення.</p>
+          </div>
+        </div>
+
+        <div class="result-box" id="indResult">
+          <p class="muted">Після розрахунку тут з’явиться покрокове пояснення.</p>
+        </div>
+      </div>
+
+      <!-- Франшиза -->
+      <div class="tab-content" id="franchiseTab">
+        <h2>Франшиза</h2>
+
+        <div class="input-grid-4">
+          <div>
+            <label for="frBase">Базова виплата до франшизи, грн</label>
+            <input type="number" id="frBase" placeholder="Наприклад: 200000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="frLoss">Збиток, грн</label>
+            <input type="number" id="frLoss" placeholder="Наприклад: 200000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="frType">Тип франшизи</label>
+            <select id="frType">
+              <option value="conditional">Умовна франшиза</option>
+              <option value="unconditional">Безумовна франшиза</option>
+            </select>
+          </div>
+          <div>
+            <label for="frMode">Франшиза: спосіб задання</label>
+            <select id="frMode">
+              <option value="fixed">Фіксована сума, грн</option>
+              <option value="percent">У відсотках від базової виплати</option>
+            </select>
+          </div>
+          <div>
+            <label for="frValue">Значення франшизи</label>
+            <input type="number" id="frValue" placeholder="Наприклад: 30000 або 3" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" onclick="calculateFranchiseOnly()">Розрахувати</button>
+          <button class="action secondary" onclick="resetFranchiseOnly()">Очистити</button>
+        </div>
+
+        <div id="frWarning" class="warning"></div>
+
+        <div class="result-box" id="frResult">
+          <p class="muted">Після розрахунку тут з’явиться пояснення.</p>
+        </div>
+      </div>
+
+      <!-- Резерви -->
+      <div class="tab-content" id="reserveTab">
+        <h2>Страхові резерви / страховий фонд</h2>
+
+        <div class="input-grid-4">
+          <div>
+            <label for="resCost">Вартість лікування / випадку, грн</label>
+            <input type="number" id="resCost" placeholder="Наприклад: 5000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="resCases">Кількість випадків / хворих</label>
+            <input type="number" id="resCases" placeholder="Наприклад: 3000" min="0" step="1" />
+          </div>
+          <div>
+            <label for="resBudget">Бюджетне покриття, %</label>
+            <input type="number" id="resBudget" placeholder="Наприклад: 40" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="resInsuredCount">Кількість страхувальників</label>
+            <input type="number" id="resInsuredCount" placeholder="Наприклад: 10000" min="1" step="1" />
+          </div>
+          <div>
+            <label for="resLoading">Навантаження до нетто, %</label>
+            <input type="number" id="resLoading" placeholder="Наприклад: 20" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" onclick="calculateReserve()">Розрахувати</button>
+          <button class="action secondary" onclick="resetReserve()">Очистити</button>
+        </div>
+
+        <div id="resWarning" class="warning"></div>
+
+        <div class="result-box" id="resResult">
+          <p class="muted">Після розрахунку тут з’явиться пояснення.</p>
+        </div>
+      </div>
+
+      <!-- Автострахування -->
+      <div class="tab-content" id="autoTab">
+        <h2>Автострахування (КАСКО)</h2>
+
+        <div class="input-grid-4">
+          <div>
+            <label for="autoSum">Страхова сума / оцінка, грн</label>
+            <input type="number" id="autoSum" placeholder="Наприклад: 950000" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoTariffDtp">Тариф ДТП, %</label>
+            <input type="number" id="autoTariffDtp" placeholder="Наприклад: 3" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoTariffNature">Тариф стихійне лихо, %</label>
+            <input type="number" id="autoTariffNature" placeholder="Наприклад: 0.2" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoTariffTheft">Тариф крадіжка / угон, %</label>
+            <input type="number" id="autoTariffTheft" placeholder="Наприклад: 5" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoDiscount">Знижка за повне КАСКО, %</label>
+            <input type="number" id="autoDiscount" placeholder="Наприклад: 15" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoFranchise">Безумовна франшиза, %</label>
+            <input type="number" id="autoFranchise" placeholder="Наприклад: 3" min="0" step="0.01" />
+          </div>
+          <div>
+            <label for="autoRepair">Вартість ремонту / збиток, грн</label>
+            <input type="number" id="autoRepair" placeholder="Наприклад: 200000" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" onclick="calculateAuto()">Розрахувати</button>
+          <button class="action secondary" onclick="resetAuto()">Очистити</button>
+        </div>
+
+        <div id="autoWarning" class="warning"></div>
+
+        <div class="result-box" id="autoResult">
+          <p class="muted">Після розрахунку тут з’явиться пояснення.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function money(value) {
+      return new Intl.NumberFormat('uk-UA', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function percent(value) {
+      return new Intl.NumberFormat('uk-UA', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function showWarning(id, text) {
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      el.innerHTML = text;
+    }
+
+    function hideWarning(id) {
+      const el = document.getElementById(id);
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+
+    function applyFranchise(baseValue, loss, franchise, type) {
+      if (type === 'none' || franchise === 0) {
+        return {
+          finalValue: baseValue,
+          explanation: 'Франшиза не застосовується.'
+        };
+      }
+
+      if (type === 'conditional') {
+        if (loss <= franchise) {
+          return {
+            finalValue: 0,
+            explanation: 'Оскільки збиток не перевищує умовну франшизу, виплата не здійснюється.'
+          };
+        } else {
+          return {
+            finalValue: baseValue,
+            explanation: 'Оскільки збиток перевищує умовну франшизу, франшиза не віднімається.'
+          };
+        }
+      }
+
+      if (type === 'unconditional') {
+        return {
+          finalValue: Math.max(baseValue - franchise, 0),
+          explanation: 'Із суми відшкодування віднімається безумовна франшиза.'
+        };
+      }
+
+      return {
+        finalValue: baseValue,
+        explanation: 'Франшиза не застосовується.'
+      };
+    }
+
+    // Вкладки
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        this.classList.add('active');
+        document.getElementById(this.dataset.tab).classList.add('active');
+      });
+    });
+
+    // 1. Страховий платіж
+    function calculatePremium() {
+      const sum = parseFloat(document.getElementById('premiumSum').value);
+      const tariff = parseFloat(document.getElementById('premiumTariff').value);
+      const discount = parseFloat(document.getElementById('premiumDiscount').value) || 0;
+      const bm = parseFloat(document.getElementById('premiumBM').value) || 1;
+      const loading = parseFloat(document.getElementById('premiumLoading').value) || 0;
+
+      hideWarning('premiumWarning');
+
+      if (isNaN(sum) || isNaN(tariff)) {
+        showWarning('premiumWarning', 'Заповніть страхову суму і тариф.');
+        return;
+      }
+
+      if (sum <= 0 || tariff < 0 || discount < 0 || bm < 0 || loading < 0) {
+        showWarning('premiumWarning', 'Усі значення мають бути коректними і невід’ємними.');
+        return;
+      }
+
+      const grossTariff = tariff * (1 - discount / 100) * bm;
+      const netPremium = sum * (grossTariff / 100);
+      const loadingAmount = netPremium * (loading / 100);
+      const grossPremium = netPremium + loadingAmount;
+
+      document.getElementById('premiumResult').innerHTML =
+        '<div class="step"><div class="step-num">1</div><div class="step-body"><strong>Коригуємо тариф на знижку та бонус-малус:</strong>' +
+        '<div class="formula-box">' + tariff + '% × (1 - ' + discount + '%) × ' + bm + ' = ' + percent(grossTariff) + '%</div></div></div>' +
+
+        '<div class="step"><div class="step-num">2</div><div class="step-body"><strong>Нетто-платіж:</strong>' +
+        '<div class="formula-box">' + money(sum) + ' × ' + percent(grossTariff / 100) + ' = ' + money(netPremium) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">3</div><div class="step-body"><strong>Навантаження:</strong>' +
+        '<div class="formula-box">' + money(netPremium) + ' × ' + loading + '% = ' + money(loadingAmount) + ' грн</div></div></div>' +
+
+        '<div class="answer-box"><div>Підсумковий результат</div><div class="answer-main">Нетто-платіж: ' + money(netPremium) + ' грн<br>Брутто-платіж: ' + money(grossPremium) + ' грн</div></div>';
+    }
+
+    function resetPremium() {
+      ['premiumSum', 'premiumTariff', 'premiumDiscount', 'premiumBM', 'premiumLoading'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('premiumBM').value = '1';
+      hideWarning('premiumWarning');
+      document.getElementById('premiumResult').innerHTML = '<p class="muted">Після розрахунку тут з’явиться покрокове пояснення.</p>';
+    }
+
+    // 2. Страхове відшкодування
+    function calculateIndemnity() {
+      const objectValue = parseFloat(document.getElementById('indObjectValue').value);
+      const insuredSum = parseFloat(document.getElementById('indInsuredSum').value);
+      const loss = parseFloat(document.getElementById('indLoss').value);
+      const franchise = parseFloat(document.getElementById('indFranchise').value) || 0;
+      const franchiseType = document.getElementById('indFranchiseType').value;
+
+      hideWarning('indWarning');
+
+      if (isNaN(objectValue) || isNaN(insuredSum) || isNaN(loss)) {
+        showWarning('indWarning', 'Заповніть вартість об’єкта, страхову суму і збиток.');
+        return;
+      }
+
+      if (objectValue <= 0 || insuredSum < 0 || loss < 0 || franchise < 0) {
+        showWarning('indWarning', 'Усі значення мають бути коректними і невід’ємними.');
+        return;
+      }
+
+      if (insuredSum > objectValue) {
+        showWarning('indWarning', 'У цій моделі страхова сума не може перевищувати вартість об’єкта.');
+        return;
+      }
+
+      if (loss > objectValue) {
+        showWarning('indWarning', 'Збиток не може перевищувати вартість об’єкта.');
+        return;
+      }
+
+      const ratio = insuredSum / objectValue;
+      const firstRiskBase = Math.min(loss, insuredSum);
+      const propBase = loss * ratio;
+
+      const firstRiskResult = applyFranchise(firstRiskBase, loss, franchise, franchiseType);
+      const propResult = applyFranchise(propBase, loss, franchise, franchiseType);
+
+      const diff = Math.abs(firstRiskResult.finalValue - propResult.finalValue);
+
+      document.getElementById('indFirstRiskValue').textContent = money(firstRiskResult.finalValue) + ' грн';
+      document.getElementById('indPropValue').textContent = money(propResult.finalValue) + ' грн';
+
+      document.getElementById('indFirstRiskText').textContent =
+        'Базова виплата: ' + money(firstRiskBase) + ' грн. Після франшизи: ' + money(firstRiskResult.finalValue) + ' грн.';
+
+      document.getElementById('indPropText').textContent =
+        'Базова виплата: ' + money(propBase) + ' грн. Після франшизи: ' + money(propResult.finalValue) + ' грн.';
+
+      document.getElementById('indResult').innerHTML =
+        '<div class="step"><div class="step-num">1</div><div class="step-body"><strong>Частка страхового покриття:</strong>' +
+        '<div class="formula-box">' + money(insuredSum) + ' / ' + money(objectValue) + ' = ' + percent(ratio) + '</div></div></div>' +
+
+        '<div class="step"><div class="step-num">2</div><div class="step-body"><strong>Перший ризик:</strong>' +
+        '<div class="formula-box">min(' + money(loss) + '; ' + money(insuredSum) + ') = ' + money(firstRiskBase) + ' грн</div>' +
+        firstRiskResult.explanation + '</div></div>' +
+
+        '<div class="step"><div class="step-num">3</div><div class="step-body"><strong>Пропорційна відповідальність:</strong>' +
+        '<div class="formula-box">' + money(loss) + ' × (' + money(insuredSum) + ' / ' + money(objectValue) + ') = ' + money(propBase) + ' грн</div>' +
+        propResult.explanation + '</div></div>' +
+
+        '<div class="answer-box"><div>Підсумковий результат</div><div class="answer-main">Різниця між кінцевими виплатами: ' + money(diff) + ' грн</div></div>';
+    }
+
+    function resetIndemnity() {
+      ['indObjectValue', 'indInsuredSum', 'indLoss', 'indFranchise'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('indFranchise').value = '0';
+      document.getElementById('indFranchiseType').value = 'none';
+
+      hideWarning('indWarning');
+      document.getElementById('indFirstRiskValue').textContent = '—';
+      document.getElementById('indPropValue').textContent = '—';
+      document.getElementById('indFirstRiskText').textContent = 'Після розрахунку тут з’явиться пояснення.';
+      document.getElementById('indPropText').textContent = 'Після розрахунку тут з’явиться пояснення.';
+      document.getElementById('indResult').innerHTML = '<p class="muted">Після розрахунку тут з’явиться покрокове пояснення.</p>';
+    }
+
+    // 3. Франшиза
+    function calculateFranchiseOnly() {
+      const base = parseFloat(document.getElementById('frBase').value);
+      const loss = parseFloat(document.getElementById('frLoss').value);
+      const type = document.getElementById('frType').value;
+      const mode = document.getElementById('frMode').value;
+      const value = parseFloat(document.getElementById('frValue').value);
+
+      hideWarning('frWarning');
+
+      if (isNaN(base) || isNaN(loss) || isNaN(value)) {
+        showWarning('frWarning', 'Заповніть базову виплату, збиток і значення франшизи.');
+        return;
+      }
+
+      if (base < 0 || loss < 0 || value < 0) {
+        showWarning('frWarning', 'Усі значення мають бути невід’ємними.');
+        return;
+      }
+
+      let franchiseAmount = value;
+      if (mode === 'percent') {
+        franchiseAmount = base * (value / 100);
+      }
+
+      const result = applyFranchise(base, loss, franchiseAmount, type);
+
+      document.getElementById('frResult').innerHTML =
+        '<div class="step"><div class="step-num">1</div><div class="step-body"><strong>Розмір франшизи:</strong>' +
+        '<div class="formula-box">' + (mode === 'percent'
+          ? money(base) + ' × ' + value + '% = ' + money(franchiseAmount) + ' грн'
+          : money(franchiseAmount) + ' грн') +
+        '</div></div></div>' +
+
+        '<div class="step"><div class="step-num">2</div><div class="step-body"><strong>Застосування франшизи:</strong>' +
+        '<div class="formula-box">Було: ' + money(base) + ' грн\nСтало: ' + money(result.finalValue) + ' грн</div>' +
+        result.explanation + '</div></div>' +
+
+        '<div class="answer-box"><div>Підсумковий результат</div><div class="answer-main">Кінцева виплата: ' + money(result.finalValue) + ' грн</div></div>';
+    }
+
+    function resetFranchiseOnly() {
+      ['frBase', 'frLoss', 'frValue'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('frType').value = 'conditional';
+      document.getElementById('frMode').value = 'fixed';
+      hideWarning('frWarning');
+      document.getElementById('frResult').innerHTML = '<p class="muted">Після розрахунку тут з’явиться пояснення.</p>';
+    }
+
+    // 4. Резерви
+    function calculateReserve() {
+      const cost = parseFloat(document.getElementById('resCost').value);
+      const casesCount = parseFloat(document.getElementById('resCases').value);
+      const budget = parseFloat(document.getElementById('resBudget').value);
+      const insuredCount = parseFloat(document.getElementById('resInsuredCount').value);
+      const loading = parseFloat(document.getElementById('resLoading').value) || 0;
+
+      hideWarning('resWarning');
+
+      if (isNaN(cost) || isNaN(casesCount) || isNaN(budget) || isNaN(insuredCount)) {
+        showWarning('resWarning', 'Заповніть усі обов’язкові поля.');
+        return;
+      }
+
+      if (cost < 0 || casesCount < 0 || budget < 0 || budget > 100 || insuredCount <= 0 || loading < 0) {
+        showWarning('resWarning', 'Перевірте коректність введених значень.');
+        return;
+      }
+
+      const totalCost = cost * casesCount;
+      const budgetAmount = totalCost * (budget / 100);
+      const reserve = totalCost - budgetAmount;
+      const netPayment = reserve / insuredCount;
+      const grossPayment = netPayment * (1 + loading / 100);
+
+      document.getElementById('resResult').innerHTML =
+        '<div class="step"><div class="step-num">1</div><div class="step-body"><strong>Загальна сума витрат:</strong>' +
+        '<div class="formula-box">' + money(cost) + ' × ' + casesCount + ' = ' + money(totalCost) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">2</div><div class="step-body"><strong>Покриття бюджету:</strong>' +
+        '<div class="formula-box">' + money(totalCost) + ' × ' + budget + '% = ' + money(budgetAmount) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">3</div><div class="step-body"><strong>Необхідний страховий резерв:</strong>' +
+        '<div class="formula-box">' + money(totalCost) + ' - ' + money(budgetAmount) + ' = ' + money(reserve) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">4</div><div class="step-body"><strong>Нетто-платіж на одного страхувальника:</strong>' +
+        '<div class="formula-box">' + money(reserve) + ' / ' + insuredCount + ' = ' + money(netPayment) + ' грн</div></div></div>' +
+
+        '<div class="answer-box"><div>Підсумковий результат</div><div class="answer-main">Резерв: ' + money(reserve) + ' грн<br>Нетто-платіж: ' + money(netPayment) + ' грн<br>Брутто-платіж: ' + money(grossPayment) + ' грн</div></div>';
+    }
+
+    function resetReserve() {
+      ['resCost', 'resCases', 'resBudget', 'resInsuredCount', 'resLoading'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      hideWarning('resWarning');
+      document.getElementById('resResult').innerHTML = '<p class="muted">Після розрахунку тут з’явиться пояснення.</p>';
+    }
+
+    // 5. Автострахування
+    function calculateAuto() {
+      const sum = parseFloat(document.getElementById('autoSum').value);
+      const tariffDtp = parseFloat(document.getElementById('autoTariffDtp').value);
+      const tariffNature = parseFloat(document.getElementById('autoTariffNature').value);
+      const tariffTheft = parseFloat(document.getElementById('autoTariffTheft').value);
+      const discount = parseFloat(document.getElementById('autoDiscount').value) || 0;
+      const franchisePercent = parseFloat(document.getElementById('autoFranchise').value) || 0;
+      const repair = parseFloat(document.getElementById('autoRepair').value);
+
+      hideWarning('autoWarning');
+
+      if (isNaN(sum) || isNaN(tariffDtp) || isNaN(tariffNature) || isNaN(tariffTheft) || isNaN(repair)) {
+        showWarning('autoWarning', 'Заповніть усі обов’язкові поля.');
+        return;
+      }
+
+      if (sum <= 0 || tariffDtp < 0 || tariffNature < 0 || tariffTheft < 0 || discount < 0 || franchisePercent < 0 || repair < 0) {
+        showWarning('autoWarning', 'Усі значення мають бути коректними і невід’ємними.');
+        return;
+      }
+
+      const totalTariff = tariffDtp + tariffNature + tariffTheft;
+      const discountedTariff = totalTariff * (1 - discount / 100);
+      const premium = sum * (discountedTariff / 100);
+
+      const franchiseAmount = sum * (franchisePercent / 100);
+      const indemnity = Math.max(repair - franchiseAmount, 0);
+
+      document.getElementById('autoResult').innerHTML =
+        '<div class="step"><div class="step-num">1</div><div class="step-body"><strong>Сукупний тариф:</strong>' +
+        '<div class="formula-box">' + tariffDtp + '% + ' + tariffNature + '% + ' + tariffTheft + '% = ' + percent(totalTariff) + '%</div></div></div>' +
+
+        '<div class="step"><div class="step-num">2</div><div class="step-body"><strong>Тариф після знижки:</strong>' +
+        '<div class="formula-box">' + percent(totalTariff) + '% × (1 - ' + discount + '%) = ' + percent(discountedTariff) + '%</div></div></div>' +
+
+        '<div class="step"><div class="step-num">3</div><div class="step-body"><strong>Страховий платіж:</strong>' +
+        '<div class="formula-box">' + money(sum) + ' × ' + percent(discountedTariff / 100) + ' = ' + money(premium) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">4</div><div class="step-body"><strong>Безумовна франшиза:</strong>' +
+        '<div class="formula-box">' + money(sum) + ' × ' + franchisePercent + '% = ' + money(franchiseAmount) + ' грн</div></div></div>' +
+
+        '<div class="step"><div class="step-num">5</div><div class="step-body"><strong>Страхове відшкодування:</strong>' +
+        '<div class="formula-box">' + money(repair) + ' - ' + money(franchiseAmount) + ' = ' + money(indemnity) + ' грн</div></div></div>' +
+
+        '<div class="answer-box"><div>Підсумковий результат</div><div class="answer-main">Страховий платіж: ' + money(premium) + ' грн<br>Страхове відшкодування: ' + money(indemnity) + ' грн</div></div>';
+    }
+
+    function resetAuto() {
+      ['autoSum', 'autoTariffDtp', 'autoTariffNature', 'autoTariffTheft', 'autoDiscount', 'autoFranchise', 'autoRepair'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      hideWarning('autoWarning');
+      document.getElementById('autoResult').innerHTML = '<p class="muted">Після розрахунку тут з’явиться пояснення.</p>';
+    }
+  </script>
+</body>
+</html>
