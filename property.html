@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Майнове страхування — навчальний модуль</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root{
+      --bg:#f4f7fb; --surface:#ffffff; --text:#13233f; --muted:#64748b; --line:#d8e1ee;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+      --successSoft:#eafcf0; --warningSoft:#fff4de; --dangerSoft:#ffe8e8; --shadow:0 16px 36px rgba(15,23,42,.08); --radius:20px;
+    }
+    body{
+      margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text); line-height:1.45;
+      background:
+        radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),
+        var(--bg);
+    }
+    .app{max-width:1280px; margin:0 auto; padding:18px;}
+    .topbar{
+      background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#7c3aed 100%);
+      color:#fff; border-radius:26px; box-shadow:var(--shadow);
+      padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap;
+    }
+    .topbar h1{margin:0; font-size:30px;}
+    .topbar .sub{margin-top:6px; font-size:14px; color:rgba(255,255,255,.9);}
+    .top-pill{
+      display:inline-flex; align-items:center; padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.18); font-weight:800;
+    }
+    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .section{
+      background:#fff; border-radius:20px; box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .section.form{background:linear-gradient(180deg,#f6f9ff,#fbfcff);}
+    .section.result{background:linear-gradient(180deg,#fcfffd,#ffffff);}
+    h2{margin:0 0 6px; font-size:26px; color:#0f172a;}
+    h3{margin:0 0 12px; font-size:18px; color:#1e3a8a;}
+    .muted{color:var(--muted); font-size:14px;}
+    .grid-2,.grid-3{display:grid; gap:16px;}
+    .grid-2{grid-template-columns:repeat(2,1fr);}
+    .grid-3{grid-template-columns:repeat(3,1fr);}
+    label{display:block; margin-bottom:6px; font-size:14px; font-weight:800; color:#22314f;}
+    input,select{
+      width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--line); font-size:15px; background:#fff; color:var(--text);
+    }
+    input:focus,select:focus{
+      outline:none; border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    }
+    input.invalid,select.invalid{
+      border-color:#ef4444; box-shadow:0 0 0 4px rgba(239,68,68,.10); background:#fffafa;
+    }
+    .hint{
+      margin-top:6px; font-size:13px; color:#475569; background:#f8fafc;
+      border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;}
+    .btn{
+      border:none; border-radius:16px; padding:13px 18px; font-size:15px; font-weight:800; cursor:pointer;
+    }
+    .btn.primary{color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary2)); box-shadow:0 12px 24px rgba(37,99,235,.22);}
+    .btn.secondary{background:#e8edf6; color:var(--text);}
+    .btn.ghost{background:#eef4ff; color:var(--primary);}
+    .warning-box{
+      display:none; margin-top:14px; padding:13px 14px; border-radius:14px;
+      background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-weight:800;
+    }
+    .status{
+      display:inline-flex; align-items:center; padding:9px 13px; border-radius:999px; font-size:13px; font-weight:800;
+      border:1px solid transparent; white-space:nowrap;
+    }
+    .status.draft{background:#edf2f7; color:#475569;}
+    .status.active{background:var(--successSoft); color:var(--success); border-color:#bbf7d0;}
+    .status.warning{background:var(--warningSoft); color:var(--warning); border-color:#fde68a;}
+    .status.denied{background:var(--dangerSoft); color:var(--danger); border-color:#fecaca;}
+
+    .summary-head{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px;
+    }
+    .metric-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:16px;}
+    .metric{
+      border-radius:18px; padding:16px; border:1px solid #dfe7f4; background:#fff; box-shadow:0 8px 18px rgba(15,23,42,.04);
+    }
+    .metric.blue{background:linear-gradient(180deg,#eff6ff,#ffffff);}
+    .metric.orange{background:linear-gradient(180deg,#fff7ed,#ffffff);}
+    .metric.green{background:linear-gradient(180deg,#ecfdf5,#ffffff);}
+    .metric .title{
+      font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800;
+    }
+    .metric .value{
+      margin-top:8px; font-size:28px; font-weight:900; color:#0f172a;
+    }
+
+    table.kv{width:100%; border-collapse:collapse;}
+    .kv td{border:1px solid #d8e0ee; padding:10px; vertical-align:top; font-size:14px;}
+    .kv td:first-child{width:42%; font-weight:800; background:#f0f6ff;}
+
+    .logic-steps{display:grid; gap:14px; margin-top:18px;}
+    .step{border-radius:16px; background:#fff; border:1px solid #e2e8f0; overflow:hidden;}
+    .step-head{
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      background:linear-gradient(180deg,#f8fbff,#fcfdff); border-bottom:1px solid #e5ebf5;
+    }
+    .step-num{
+      width:34px; height:34px; flex:0 0 34px; border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff;
+      display:flex; align-items:center; justify-content:center; font-weight:900;
+    }
+    .step-title{font-size:16px; font-weight:900; color:#13254a;}
+    .step-body{padding:14px;}
+    .logic-block{margin-bottom:14px;}
+    .logic-label{
+      font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:900; margin-bottom:6px;
+    }
+    .formula-box{
+      background:#f8fbff; border:1px solid #cfe0ff; border-left:6px solid var(--primary);
+      border-radius:14px; padding:14px; white-space:pre-line; color:#163056;
+    }
+    .note{
+      background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px; color:#334155; font-size:14px;
+    }
+    .compare-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+    .compare-card{
+      border-radius:18px; padding:16px; background:#fff; border:1px solid #dfe7f4; box-shadow:0 8px 18px rgba(15,23,42,.04);
+    }
+    .compare-card h4{margin:0 0 12px; font-size:18px; color:#1e3a8a;}
+    .hidden{display:none;}
+    @media (max-width:980px){
+      .layout,.grid-2,.grid-3,.metric-grid,.compare-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Майнове страхування</h1>
+        <div class="sub">Розрахунок страхового відшкодування за системою першого ризику та пропорційної відповідальності.</div>
+      </div>
+      <div class="top-pill">Навчальний режим</div>
+    </div>
+
+    <div class="layout">
+      <section class="section form">
+        <h2>Вхідні дані</h2>
+        <div class="muted">Вводьте лише ті параметри, які реально впливають на відшкодування.</div>
+
+        <div style="margin-top:18px;">
+          <h3>Параметри договору</h3>
+          <div class="grid-2">
+            <div>
+              <label for="objectValue">Вартість об’єкта, грн</label>
+              <input id="objectValue" type="text" inputmode="numeric" placeholder="Наприклад: 1 000 000" />
+              <div class="hint">Повна вартість застрахованого майна.</div>
+            </div>
+            <div>
+              <label for="insuredSum">Страхова сума, грн</label>
+              <input id="insuredSum" type="text" inputmode="numeric" placeholder="Наприклад: 800 000" />
+              <div class="hint">Частина вартості, на яку укладено договір.</div>
+            </div>
+            <div>
+              <label for="lossAmount">Сума збитку, грн</label>
+              <input id="lossAmount" type="text" inputmode="numeric" placeholder="Наприклад: 300 000" />
+              <div class="hint">Фактичний розмір збитку.</div>
+            </div>
+            <div>
+              <label for="liabilitySystem">Система відповідальності</label>
+              <select id="liabilitySystem">
+                <option value="first_risk">Перший ризик</option>
+                <option value="proportional">Пропорційна відповідальність</option>
+                <option value="compare">Порівняти обидві системи</option>
+              </select>
+              <div class="hint" id="systemHint">Пояснення системи: —</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Франшиза</h3>
+          <div class="grid-2">
+            <div>
+              <label for="franchiseType">Тип франшизи</label>
+              <select id="franchiseType">
+                <option value="none">Без франшизи</option>
+                <option value="conditional">Умовна</option>
+                <option value="unconditional">Безумовна</option>
+              </select>
+              <div class="hint" id="franchiseHint">Пояснення франшизи: —</div>
+            </div>
+            <div>
+              <label for="franchiseValue">Розмір франшизи, грн</label>
+              <input id="franchiseValue" type="text" inputmode="numeric" value="0" placeholder="Наприклад: 20 000" />
+              <div class="hint">Не може перевищувати страхову суму.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Контроль умов</h3>
+          <table class="kv">
+            <tr><td>Рівень страхового покриття</td><td id="coverageRatioView">—</td></tr>
+            <tr><td>Недострахування</td><td id="underinsuranceView">—</td></tr>
+            <tr><td>Співвідношення страхова сума / вартість</td><td id="ratioFormulaView">—</td></tr>
+            <tr><td>Збиток перевищує страхову суму</td><td id="lossVsSumView">—</td></tr>
+            <tr><td>Франшиза коректна</td><td id="franchiseCheckView">—</td></tr>
+          </table>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="calculateModule()">Розрахувати</button>
+          <button class="btn secondary" onclick="resetForm()">Очистити</button>
+          <button class="btn ghost" onclick="fillExample()">Заповнити приклад</button>
+        </div>
+
+        <div id="formWarning" class="warning-box"></div>
+      </section>
+
+      <section class="section result">
+        <div class="summary-head">
+          <div>
+            <h2>Результат</h2>
+            <div class="muted">Блок оновлюється після розрахунку.</div>
+          </div>
+          <div id="resultStatus" class="status draft">Очікує розрахунку</div>
+        </div>
+
+        <div id="singleResultBlock">
+          <div class="metric-grid">
+            <div class="metric blue">
+              <div class="title">Базова виплата</div>
+              <div class="value" id="basePayoutView">—</div>
+            </div>
+            <div class="metric orange">
+              <div class="title">Франшиза</div>
+              <div class="value" id="franchiseAppliedView">—</div>
+            </div>
+            <div class="metric green">
+              <div class="title">Кінцева виплата</div>
+              <div class="value" id="finalPayoutView">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="compareResultBlock" class="hidden">
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h4>Перший ризик</h4>
+              <table class="kv">
+                <tr><td>Базова виплата</td><td id="compareFirstBase">—</td></tr>
+                <tr><td>Франшиза</td><td id="compareFirstFr">—</td></tr>
+                <tr><td>Кінцева виплата</td><td id="compareFirstFinal">—</td></tr>
+              </table>
+            </div>
+            <div class="compare-card">
+              <h4>Пропорційна відповідальність</h4>
+              <table class="kv">
+                <tr><td>Базова виплата</td><td id="comparePropBase">—</td></tr>
+                <tr><td>Франшиза</td><td id="comparePropFr">—</td></tr>
+                <tr><td>Кінцева виплата</td><td id="comparePropFinal">—</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="note" style="margin-top:16px;" id="compareDifference">—</div>
+        </div>
+
+        <table class="kv" style="margin-top:16px;">
+          <tr><td>Підсумкове рішення</td><td id="decisionView">—</td></tr>
+          <tr><td>Службове пояснення</td><td id="decisionNoteView">—</td></tr>
+        </table>
+      </section>
+    </div>
+
+    <section class="section" style="margin-top:18px;">
+      <h2>Хід розрахунку</h2>
+      <div class="logic-steps">
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">1</div>
+            <div class="step-title">Оцінка страхового покриття</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Правило</div>
+              <div class="note">Спочатку визначаємо, на яку частину вартості об’єкта поширюється страхове покриття.</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Пояснення для студента</div>
+              <div class="note" id="logicExplain1">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">2</div>
+            <div class="step-title">Базова виплата</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Правило</div>
+              <div class="note" id="logicRule2">—</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicSub2">—</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Пояснення</div>
+              <div class="note" id="logicExplain2">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">3</div>
+            <div class="step-title">Застосування франшизи</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Правило</div>
+              <div class="note" id="logicRule3">—</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicSub3">—</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Пояснення</div>
+              <div class="note" id="logicExplain3">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">4</div>
+            <div class="step-title">Підсумок</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Фінальний висновок</div>
+              <div class="note" id="logicExplain4">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function money(v){
+      return new Intl.NumberFormat('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+    }
+
+    function showWarning(id, text){
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      el.innerHTML = text;
+    }
+
+    function hideWarning(id){
+      const el = document.getElementById(id);
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+
+    function clearInvalids(){
+      document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
+    function markInvalid(...ids){
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('invalid');
+      });
+    }
+
+    function setStatus(cls, text){
+      const el = document.getElementById('resultStatus');
+      el.className = 'status ' + cls;
+      el.textContent = text;
+    }
+
+    function parseMoneyInput(value){
+      if (typeof value !== 'string') return NaN;
+      const cleaned = value.replace(/\s+/g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+      return cleaned ? parseFloat(cleaned) : NaN;
+    }
+
+    function formatIntegerLike(value){
+      if (value === null || value === undefined) return '';
+      const digits = String(value).replace(/\D/g, '');
+      if (!digits) return '';
+      return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Number(digits));
+    }
+
+    function attachMoneyFormatting(id){
+      const el = document.getElementById(id);
+      const formatNow = () => {
+        el.value = formatIntegerLike(el.value);
+      };
+      el.addEventListener('input', formatNow);
+      el.addEventListener('blur', formatNow);
+    }
+
+    function getValues(){
+      return {
+        objectValue: parseMoneyInput(document.getElementById('objectValue').value),
+        insuredSum: parseMoneyInput(document.getElementById('insuredSum').value),
+        lossAmount: parseMoneyInput(document.getElementById('lossAmount').value),
+        liabilitySystem: document.getElementById('liabilitySystem').value,
+        franchiseType: document.getElementById('franchiseType').value,
+        franchiseValue: parseMoneyInput(document.getElementById('franchiseValue').value) || 0
+      };
+    }
+
+
+    function updateStaticHints(){
+      const system = document.getElementById('liabilitySystem').value;
+      const frType = document.getElementById('franchiseType').value;
+
+      const systemMap = {
+        first_risk: 'Страховик виплачує суму збитку, але не більше страхової суми.',
+        proportional: 'Якщо майно застраховане не на повну вартість, збиток відшкодовується пропорційно.',
+        compare: 'Система покаже результати за обома підходами одночасно.'
+      };
+
+      const frMap = {
+        none: 'Франшиза не зменшує виплату.',
+        conditional: 'Якщо збиток не перевищує франшизу, виплата = 0. Якщо перевищує — франшиза не віднімається.',
+        unconditional: 'Франшиза завжди віднімається від базової виплати.'
+      };
+
+      document.getElementById('systemHint').textContent = systemMap[system];
+      document.getElementById('franchiseHint').textContent = frMap[frType];
+    }
+
+    function updateControlBlock(){
+      try{
+        const d = getValues();
+        const ratio = d.insuredSum / d.objectValue;
+        const coveragePercent = ratio * 100;
+        const underinsurance = d.insuredSum < d.objectValue;
+        const lossVsSum = d.lossAmount > d.insuredSum;
+        const franchiseOk = d.franchiseValue <= d.insuredSum && d.franchiseValue >= 0;
+
+        document.getElementById('coverageRatioView').textContent =
+          isFinite(coveragePercent) ? `${money(coveragePercent)}%` : '—';
+
+        document.getElementById('underinsuranceView').textContent =
+          !isFinite(ratio) ? '—' : (underinsurance ? 'Так, є недострахування' : 'Ні, повне покриття');
+
+        document.getElementById('ratioFormulaView').textContent =
+          (isFinite(d.insuredSum) && isFinite(d.objectValue) && d.objectValue > 0)
+            ? `${money(d.insuredSum)} / ${money(d.objectValue)} = ${money(ratio)}`
+            : '—';
+
+        document.getElementById('lossVsSumView').textContent =
+          (!isFinite(d.lossAmount) || !isFinite(d.insuredSum)) ? '—' : (lossVsSum ? 'Так' : 'Ні');
+
+        document.getElementById('franchiseCheckView').textContent =
+          (!isFinite(d.insuredSum)) ? '—' : (franchiseOk ? 'Так' : 'Ні');
+      }catch(e){}
+    }
+
+    function validateInputs(d){
+      clearInvalids();
+      hideWarning('formWarning');
+
+      if(!isFinite(d.objectValue) || d.objectValue <= 0){
+        markInvalid('objectValue');
+        showWarning('formWarning', 'Вартість об’єкта має бути більшою за нуль.');
+        return false;
+      }
+      if(!isFinite(d.insuredSum) || d.insuredSum <= 0){
+        markInvalid('insuredSum');
+        showWarning('formWarning', 'Страхова сума має бути більшою за нуль.');
+        return false;
+      }
+      if(d.insuredSum > d.objectValue){
+        markInvalid('insuredSum','objectValue');
+        showWarning('formWarning', 'Страхова сума не може перевищувати вартість об’єкта.');
+        return false;
+      }
+      if(!isFinite(d.lossAmount) || d.lossAmount <= 0){
+        markInvalid('lossAmount');
+        showWarning('formWarning', 'Сума збитку має бути більшою за нуль.');
+        return false;
+      }
+      if(d.lossAmount > d.objectValue){
+        markInvalid('lossAmount','objectValue');
+        showWarning('formWarning', 'Сума збитку не може перевищувати вартість об’єкта.');
+        return false;
+      }
+      if(d.franchiseValue < 0){
+        markInvalid('franchiseValue');
+        showWarning('formWarning', 'Франшиза не може бути від’ємною.');
+        return false;
+      }
+      if(d.franchiseValue > d.insuredSum){
+        markInvalid('franchiseValue','insuredSum');
+        showWarning('formWarning', 'Франшиза не може перевищувати страхову суму.');
+        return false;
+      }
+
+      return true;
+    }
+
+    function calcFirstRisk(d){
+      const base = Math.min(d.lossAmount, d.insuredSum);
+      return applyFranchise(base, d.lossAmount, d.franchiseType, d.franchiseValue);
+    }
+
+    function calcProportional(d){
+      const ratio = d.insuredSum / d.objectValue;
+      const base = d.lossAmount * ratio;
+      return applyFranchise(base, d.lossAmount, d.franchiseType, d.franchiseValue);
+    }
+
+    function applyFranchise(baseValue, loss, type, franchise){
+      if(type === 'none' || franchise === 0){
+        return {
+          base: baseValue,
+          applied: 0,
+          final: baseValue,
+          rule: 'Франшиза відсутня, тому базова виплата не змінюється.',
+          substitution: `${money(baseValue)} = ${money(baseValue)} грн`,
+          explanation: 'Оскільки франшиза не передбачена, вся базова виплата переходить у фінальну.'
+        };
+      }
+
+      if(type === 'conditional'){
+        if(loss <= franchise){
+          return {
+            base: baseValue,
+            applied: 0,
+            final: 0,
+            rule: 'За умовної франшизи, якщо збиток не перевищує франшизу, виплата не здійснюється.',
+            substitution: `${money(loss)} ≤ ${money(franchise)} → виплата = 0 грн`,
+            explanation: 'Збиток не перевищує умовну франшизу, тому страховик не проводить виплату.'
+          };
+        }
+        return {
+          base: baseValue,
+          applied: 0,
+          final: baseValue,
+          rule: 'За умовної франшизи, якщо збиток перевищує франшизу, франшиза не віднімається.',
+          substitution: `${money(loss)} > ${money(franchise)} → виплата = ${money(baseValue)} грн`,
+          explanation: 'Збиток перевищує умовну франшизу, тому до виплати береться повна базова сума.'
+        };
+      }
+
+      const final = Math.max(baseValue - franchise, 0);
+      return {
+        base: baseValue,
+        applied: franchise,
+        final,
+        rule: 'За безумовної франшизи її сума завжди віднімається від базової виплати.',
+        substitution: `${money(baseValue)} − ${money(franchise)} = ${money(final)} грн`,
+        explanation: 'Безумовна франшиза зменшує суму страхової виплати незалежно від розміру збитку.'
+      };
+    }
+
+    function renderSingleResult(res, systemLabel){
+      document.getElementById('singleResultBlock').classList.remove('hidden');
+      document.getElementById('compareResultBlock').classList.add('hidden');
+
+      document.getElementById('basePayoutView').textContent = money(res.base) + ' грн';
+      document.getElementById('franchiseAppliedView').textContent = money(res.applied) + ' грн';
+      document.getElementById('finalPayoutView').textContent = money(res.final) + ' грн';
+
+      if(res.final === 0){
+        setStatus('warning', 'Виплата = 0');
+      } else if(res.final < res.base){
+        setStatus('warning', 'Часткова виплата');
+      } else {
+        setStatus('active', 'До виплати');
+      }
+
+      document.getElementById('decisionView').textContent = `${systemLabel}: ${money(res.final)} грн`;
+      document.getElementById('decisionNoteView').textContent = res.explanation;
+    }
+
+    function renderCompareResult(first, prop){
+      document.getElementById('singleResultBlock').classList.add('hidden');
+      document.getElementById('compareResultBlock').classList.remove('hidden');
+
+      document.getElementById('compareFirstBase').textContent = money(first.base) + ' грн';
+      document.getElementById('compareFirstFr').textContent = money(first.applied) + ' грн';
+      document.getElementById('compareFirstFinal').textContent = money(first.final) + ' грн';
+
+      document.getElementById('comparePropBase').textContent = money(prop.base) + ' грн';
+      document.getElementById('comparePropFr').textContent = money(prop.applied) + ' грн';
+      document.getElementById('comparePropFinal').textContent = money(prop.final) + ' грн';
+
+      const diff = first.final - prop.final;
+      let compareText = '';
+      if(diff > 0){
+        compareText = `Система першого ризику дає більшу виплату на ${money(diff)} грн.`;
+      } else if(diff < 0){
+        compareText = `Пропорційна відповідальність дає більшу виплату на ${money(Math.abs(diff))} грн.`;
+      } else {
+        compareText = 'Обидві системи дають однаковий результат.';
+      }
+
+      document.getElementById('compareDifference').textContent = compareText;
+      setStatus('active', 'Порівняння систем');
+      document.getElementById('decisionView').textContent = compareText;
+      document.getElementById('decisionNoteView').textContent = 'Система одночасно обчислила виплату за двома підходами.';
+    }
+
+    function renderLogic(d, system, res){
+      const ratio = d.insuredSum / d.objectValue;
+      const coveragePercent = ratio * 100;
+
+      document.getElementById('logicExplain1').textContent =
+        `Об’єкт застраховано на ${money(coveragePercent)}% його вартості. ` +
+        (d.insuredSum < d.objectValue
+          ? 'Отже, є недострахування.'
+          : 'Отже, страхове покриття повне.');
+
+      if(system === 'first_risk'){
+        document.getElementById('logicRule2').textContent =
+          'Страховик виплачує суму збитку, але не більше страхової суми.';
+        document.getElementById('logicSub2').textContent =
+          `Порівнюємо:\nзбиток = ${money(d.lossAmount)} грн\nстрахова сума = ${money(d.insuredSum)} грн\n\nМенша сума = ${money(res.base)} грн`;
+        document.getElementById('logicExplain2').textContent =
+          'Оскільки за системою першого ризику виплата обмежується страховою сумою, базова виплата дорівнює меншій із двох сум.';
+      } else if(system === 'proportional'){
+        document.getElementById('logicRule2').textContent =
+          'Якщо майно застраховане не на повну вартість, збиток відшкодовується пропорційно.';
+        document.getElementById('logicSub2').textContent =
+          `Об’єкт застраховано на ${money(coveragePercent)}%.\nТому відшкодовується ${money(coveragePercent)}% збитку.\n\n${money(d.lossAmount)} × ${money(ratio)} = ${money(res.base)} грн`;
+        document.getElementById('logicExplain2').textContent =
+          'Чим менша страхова сума порівняно з вартістю об’єкта, тим меншу частину збитку відшкодовує страховик.';
+      } else {
+        document.getElementById('logicRule2').textContent =
+          'Система одночасно обчислює виплату за першим ризиком і за пропорційною відповідальністю.';
+        document.getElementById('logicSub2').textContent =
+          'Перший ризик: виплата дорівнює меншій із двох сум — збитку або страховій сумі.\n' +
+          `Пропорційна відповідальність: ${money(d.lossAmount)} × ${money(ratio)} = ${money(res.base)} грн`;
+        document.getElementById('logicExplain2').textContent =
+          'Режим порівняння потрібен, щоб студент одразу побачив різницю між двома підходами.';
+      }
+
+      document.getElementById('logicRule3').textContent = res.rule;
+      document.getElementById('logicSub3').textContent = res.substitution;
+      document.getElementById('logicExplain3').textContent = res.explanation;
+      document.getElementById('logicExplain4').textContent =
+        `Кінцева виплата становить ${money(res.final)} грн. Це підсумок після застосування вибраної системи відповідальності та франшизи.`;
+    }
+
+    function calculateModule(){
+      const d = getValues();
+      updateStaticHints();
+      updateControlBlock();
+
+      if(!validateInputs(d)) return;
+
+      if(d.liabilitySystem === 'first_risk'){
+        const res = calcFirstRisk(d);
+        renderSingleResult(res, 'Перший ризик');
+        renderLogic(d, 'first_risk', res);
+      } else if(d.liabilitySystem === 'proportional'){
+        const res = calcProportional(d);
+        renderSingleResult(res, 'Пропорційна відповідальність');
+        renderLogic(d, 'proportional', res);
+      } else {
+        const first = calcFirstRisk(d);
+        const prop = calcProportional(d);
+        renderCompareResult(first, prop);
+        renderLogic(d, 'compare', prop);
+      }
+    }
+
+    function resetForm(){
+      clearInvalids();
+      document.getElementById('objectValue').value = '';
+      document.getElementById('insuredSum').value = '';
+      document.getElementById('lossAmount').value = '';
+      document.getElementById('liabilitySystem').value = 'first_risk';
+      document.getElementById('franchiseType').value = 'none';
+      document.getElementById('franchiseValue').value = '0';
+      hideWarning('formWarning');
+
+      document.getElementById('coverageRatioView').textContent = '—';
+      document.getElementById('underinsuranceView').textContent = '—';
+      document.getElementById('ratioFormulaView').textContent = '—';
+      document.getElementById('lossVsSumView').textContent = '—';
+      document.getElementById('franchiseCheckView').textContent = '—';
+
+      document.getElementById('basePayoutView').textContent = '—';
+      document.getElementById('franchiseAppliedView').textContent = '—';
+      document.getElementById('finalPayoutView').textContent = '—';
+
+      document.getElementById('decisionView').textContent = '—';
+      document.getElementById('decisionNoteView').textContent = '—';
+
+      document.getElementById('compareFirstBase').textContent = '—';
+      document.getElementById('compareFirstFr').textContent = '—';
+      document.getElementById('compareFirstFinal').textContent = '—';
+      document.getElementById('comparePropBase').textContent = '—';
+      document.getElementById('comparePropFr').textContent = '—';
+      document.getElementById('comparePropFinal').textContent = '—';
+      document.getElementById('compareDifference').textContent = '—';
+
+      document.getElementById('logicExplain1').textContent = '—';
+      document.getElementById('logicRule2').textContent = '—';
+      document.getElementById('logicSub2').textContent = '—';
+      document.getElementById('logicExplain2').textContent = '—';
+      document.getElementById('logicRule3').textContent = '—';
+      document.getElementById('logicSub3').textContent = '—';
+      document.getElementById('logicExplain3').textContent = '—';
+      document.getElementById('logicExplain4').textContent = '—';
+
+      document.getElementById('singleResultBlock').classList.remove('hidden');
+      document.getElementById('compareResultBlock').classList.add('hidden');
+      setStatus('draft', 'Очікує розрахунку');
+      updateStaticHints();
+      updateControlBlock();
+    }
+
+    function fillExample(){
+      document.getElementById('objectValue').value = '1000000';
+      document.getElementById('insuredSum').value = '800000';
+      document.getElementById('lossAmount').value = '300000';
+      document.getElementById('liabilitySystem').value = 'compare';
+      document.getElementById('franchiseType').value = 'unconditional';
+      document.getElementById('franchiseValue').value = '20000';
+      updateStaticHints();
+      updateControlBlock();
+    }
+
+    ['objectValue','insuredSum','lossAmount','liabilitySystem','franchiseType','franchiseValue'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        updateStaticHints();
+        updateControlBlock();
+      });
+      document.getElementById(id).addEventListener('change', () => {
+        updateStaticHints();
+        updateControlBlock();
+      });
+    });
+
+    ['objectValue','insuredSum','lossAmount','franchiseValue'].forEach(attachMoneyFormatting);
+
+    updateStaticHints();
+    updateControlBlock();
+  </script>
+</body>
+</html>

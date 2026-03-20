@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор страхового платежу</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root{
+      --bg:#f4f7fb; --surface:#ffffff; --text:#13233f; --muted:#64748b; --line:#d8e1ee;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+      --successSoft:#eafcf0; --warningSoft:#fff4de; --dangerSoft:#ffe8e8;
+      --shadow:0 16px 36px rgba(15,23,42,.08); --radius:20px;
+    }
+    body{
+      margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text); line-height:1.45;
+      background:
+        radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),
+        var(--bg);
+    }
+    .app{max-width:1380px; margin:0 auto; padding:18px;}
+    .topbar{
+      background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#7c3aed 100%);
+      color:#fff; border-radius:26px; box-shadow:var(--shadow);
+      padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap;
+    }
+    .topbar h1{margin:0; font-size:30px;}
+    .topbar .sub{margin-top:6px; font-size:14px; color:rgba(255,255,255,.9);}
+    .top-pill{
+      display:inline-flex; align-items:center; padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.18); font-weight:800;
+    }
+    .section{
+      background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:18px; margin-bottom:18px;
+    }
+    h2{margin:0 0 6px; font-size:26px; color:#0f172a;}
+    h3{margin:0 0 12px; font-size:18px; color:#1e3a8a;}
+    .muted{color:var(--muted); font-size:14px;}
+    .object-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:16px;}
+    .object-card{
+      border:2px solid #dbe3f0; border-radius:20px; overflow:hidden; background:#fff; cursor:pointer; transition:.2s ease;
+      box-shadow:0 8px 18px rgba(15,23,42,.05);
+    }
+    .object-card:hover{transform:translateY(-2px); box-shadow:0 12px 24px rgba(15,23,42,.10);}
+    .object-card.selected{border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+    .object-visual{
+      height:120px; display:flex; align-items:center; justify-content:center; font-size:52px; color:#fff; font-weight:700;
+    }
+    .apartment{background:linear-gradient(135deg,#3b82f6,#6366f1);}
+    .house{background:linear-gradient(135deg,#10b981,#059669);}
+    .shop{background:linear-gradient(135deg,#f59e0b,#ea580c);}
+    .warehouse{background:linear-gradient(135deg,#6b7280,#374151);}
+    .object-body{padding:14px;}
+    .object-body h4{margin:0 0 10px; font-size:18px;}
+    .object-body p{margin:4px 0; font-size:14px; color:#334155;}
+    .badge{
+      display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; margin-top:10px;
+    }
+    .badge.low{background:#eafcf0; color:#15803d;}
+    .badge.mid{background:#fff4de; color:#b45309;}
+    .badge.high{background:#ffe8e8; color:#b91c1c;}
+
+    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .section.form{background:linear-gradient(180deg,#f6f9ff,#fbfcff);}
+    .section.result{background:linear-gradient(180deg,#fcfffd,#ffffff);}
+    .grid-2,.grid-3{display:grid; gap:16px;}
+    .grid-2{grid-template-columns:repeat(2,1fr);}
+    .grid-3{grid-template-columns:repeat(3,1fr);}
+    label{display:block; margin-bottom:6px; font-size:14px; font-weight:800; color:#22314f;}
+    input,select{
+      width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--line); font-size:15px; background:#fff; color:var(--text);
+    }
+    input:focus,select:focus{
+      outline:none; border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    }
+    input.invalid,select.invalid{
+      border-color:#ef4444; box-shadow:0 0 0 4px rgba(239,68,68,.10); background:#fffafa;
+    }
+    .hint{
+      margin-top:6px; font-size:13px; color:#475569; background:#f8fafc;
+      border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;}
+    .btn{
+      border:none; border-radius:16px; padding:13px 18px; font-size:15px; font-weight:800; cursor:pointer;
+    }
+    .btn.primary{color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary2)); box-shadow:0 12px 24px rgba(37,99,235,.22);}
+    .btn.secondary{background:#e8edf6; color:var(--text);}
+    .btn.ghost{background:#eef4ff; color:var(--primary);}
+    .warning-box{
+      display:none; margin-top:14px; padding:13px 14px; border-radius:14px;
+      background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-weight:800;
+    }
+    .status{
+      display:inline-flex; align-items:center; padding:9px 13px; border-radius:999px; font-size:13px; font-weight:800;
+      border:1px solid transparent; white-space:nowrap;
+    }
+    .status.draft{background:#edf2f7; color:#475569;}
+    .status.active{background:var(--successSoft); color:var(--success); border-color:#bbf7d0;}
+    .metric-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:16px;}
+    .metric{
+      border-radius:18px; padding:16px; border:1px solid #dfe7f4; background:#fff; box-shadow:0 8px 18px rgba(15,23,42,.04);
+    }
+    .metric.blue{background:linear-gradient(180deg,#eff6ff,#ffffff);}
+    .metric.orange{background:linear-gradient(180deg,#fff7ed,#ffffff);}
+    .metric.green{background:linear-gradient(180deg,#ecfdf5,#ffffff);}
+    .metric.purple{background:linear-gradient(180deg,#f3e8ff,#ffffff);}
+    .metric .title{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800;}
+    .metric .value{margin-top:8px; font-size:28px; font-weight:900; color:#0f172a;}
+    table.kv{width:100%; border-collapse:collapse;}
+    .kv td{border:1px solid #d8e0ee; padding:10px; vertical-align:top; font-size:14px;}
+    .kv td:first-child{width:42%; font-weight:800; background:#f0f6ff;}
+    .logic-steps{display:grid; gap:14px; margin-top:18px;}
+    .step{border-radius:16px; background:#fff; border:1px solid #e2e8f0; overflow:hidden;}
+    .step-head{
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      background:linear-gradient(180deg,#f8fbff,#fcfdff); border-bottom:1px solid #e5ebf5;
+    }
+    .step-num{
+      width:34px; height:34px; flex:0 0 34px; border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff;
+      display:flex; align-items:center; justify-content:center; font-weight:900;
+    }
+    .step-title{font-size:16px; font-weight:900; color:#13254a;}
+    .step-body{padding:14px;}
+    .logic-block{margin-bottom:14px;}
+    .logic-label{
+      font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:900; margin-bottom:6px;
+    }
+    .formula-box{
+      background:#f8fbff; border:1px solid #cfe0ff; border-left:6px solid var(--primary);
+      border-radius:14px; padding:14px; white-space:pre-line; color:#163056;
+    }
+    .note{
+      background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px; color:#334155; font-size:14px;
+    }
+    @media (max-width:1100px){
+      .object-grid{grid-template-columns:repeat(2,1fr);}
+      .layout,.grid-2,.grid-3,.metric-grid{grid-template-columns:1fr;}
+    }
+    @media (max-width:650px){
+      .object-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Конструктор страхового платежу</h1>
+        <div class="sub">Оберіть конкретний об’єкт, система сама підставить його ризикові характеристики і покаже, як формується страховий платіж.</div>
+      </div>
+      <div class="top-pill">Навчальний режим</div>
+    </div>
+
+    <section class="section">
+      <h2>Оберіть об’єкт страхування</h2>
+      <div class="muted">Кожен об’єкт має свої ризикові характеристики: імовірність настання ризику, середній збиток і навантаження.</div>
+
+      <div class="object-grid" id="objectGrid"></div>
+    </section>
+
+    <div class="layout">
+      <section class="section form">
+        <h2>Умови договору</h2>
+        <div class="muted">Після вибору об’єкта система підтягує базові параметри. Ви змінюєте страхову суму, покриття та франшизу.</div>
+
+        <div style="margin-top:18px;">
+          <h3>Обраний об’єкт</h3>
+          <table class="kv">
+            <tr><td>Назва</td><td id="selectedName">—</td></tr>
+            <tr><td>Місцезнаходження</td><td id="selectedLocation">—</td></tr>
+            <tr><td>Площа</td><td id="selectedArea">—</td></tr>
+            <tr><td>Ринкова вартість</td><td id="selectedValue">—</td></tr>
+            <tr><td>Базова імовірність ризику</td><td id="selectedProb">—</td></tr>
+            <tr><td>Середній збиток</td><td id="selectedLoss">—</td></tr>
+            <tr><td>Базове навантаження</td><td id="selectedLoading">—</td></tr>
+          </table>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Параметри страхування</h3>
+          <div class="grid-2">
+            <div>
+              <label for="sumInsured">Страхова сума, грн</label>
+              <input id="sumInsured" type="text" inputmode="numeric" placeholder="Наприклад: 2 000 000">
+              <div class="hint">Можете взяти повну вартість або змоделювати недострахування.</div>
+            </div>
+            <div>
+              <label for="coverageLevel">Обсяг покриття</label>
+              <select id="coverageLevel">
+                <option value="minimal">Мінімальний</option>
+                <option value="standard" selected>Стандартний</option>
+                <option value="full">Повний</option>
+              </select>
+              <div class="hint" id="coverageHint">Стандартне покриття: без різких коригувань.</div>
+            </div>
+
+            <div>
+              <label for="franchiseValue">Франшиза, грн</label>
+              <select id="franchiseValue">
+                <option value="0">0 грн</option>
+                <option value="5000">5 000 грн</option>
+                <option value="10000">10 000 грн</option>
+                <option value="20000">20 000 грн</option>
+                <option value="50000">50 000 грн</option>
+              </select>
+              <div class="hint" id="franchiseHint">Менша франшиза робить поліс дорожчим.</div>
+            </div>
+            <div>
+              <label for="policyTerm">Строк договору</label>
+              <select id="policyTerm">
+                <option value="6">6 місяців</option>
+                <option value="12" selected>12 місяців</option>
+              </select>
+              <div class="hint">Довший строк — вищий платіж.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Що підсумково бере система</h3>
+          <table class="kv">
+            <tr><td>Фактична імовірність страхового випадку</td><td id="effectiveProbView">—</td></tr>
+            <tr><td>Фактичний середній збиток</td><td id="effectiveLossView">—</td></tr>
+            <tr><td>Фактичне навантаження</td><td id="effectiveLoadingView">—</td></tr>
+          </table>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="calculatePremium()">Розрахувати</button>
+          <button class="btn secondary" onclick="resetSelections()">Очистити</button>
+          <button class="btn ghost" onclick="fillRecommended()">Рекомендована сума</button>
+        </div>
+
+        <div id="formWarning" class="warning-box"></div>
+      </section>
+
+      <section class="section result">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+          <div>
+            <h2>Результат</h2>
+            <div class="muted">Професійні страхові показники, які система обчислює автоматично.</div>
+          </div>
+          <div id="resultStatus" class="status draft">Оберіть об’єкт</div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric blue">
+            <div class="title">Очікувана виплата на 1 договір</div>
+            <div class="value" id="expectedLossView">—</div>
+          </div>
+          <div class="metric orange">
+            <div class="title">Нетто-ставка</div>
+            <div class="value" id="netRateView">—</div>
+          </div>
+          <div class="metric green">
+            <div class="title">Нетто-премія</div>
+            <div class="value" id="netPremiumView">—</div>
+          </div>
+          <div class="metric purple">
+            <div class="title">Страховий платіж</div>
+            <div class="value" id="grossPremiumView">—</div>
+          </div>
+        </div>
+
+        <table class="kv">
+          <tr><td>Навантаження у грн</td><td id="loadingAmountView">—</td></tr>
+          <tr><td>Що підвищило / знизило платіж</td><td id="factorImpactView">—</td></tr>
+          <tr><td>Пояснення</td><td id="decisionNoteView">—</td></tr>
+        </table>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Хід розрахунку</h2>
+      <div class="logic-steps">
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">1</div>
+            <div class="step-title">Ризикова база об’єкта</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Правило</div>
+              <div class="note">Кожний об’єкт має свою базову імовірність страхового випадку, середній збиток і навантаження. Далі система коригує їх залежно від покриття, франшизи та строку договору.</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Пояснення</div>
+              <div class="formula-box" id="logicStep1">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">2</div>
+            <div class="step-title">Очікувана виплата та нетто-ставка</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicStep2">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">3</div>
+            <div class="step-title">Навантаження</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicStep3">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">4</div>
+            <div class="step-title">Підсумковий страховий платіж</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Фінальний висновок</div>
+              <div class="note" id="logicStep4">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const objects = [
+      {id:'ap1', cat:'apartment', icon:'🏢', visual:'apartment', title:'Квартира 1', location:'м. Київ', area:'78 м²', marketValue:2400000, riskProbability:1.8, avgLossPercent:18, loadingPercent:18, riskLabel:'Низький ризик', riskClass:'low'},
+      {id:'ap2', cat:'apartment', icon:'🏢', visual:'apartment', title:'Квартира 2', location:'м. Львів', area:'62 м²', marketValue:1850000, riskProbability:2.2, avgLossPercent:20, loadingPercent:19, riskLabel:'Низький ризик', riskClass:'low'},
+      {id:'ho1', cat:'house', icon:'🏠', visual:'house', title:'Будинок 1', location:'передмістя Києва', area:'165 м²', marketValue:4800000, riskProbability:3.1, avgLossPercent:26, loadingPercent:22, riskLabel:'Середній ризик', riskClass:'mid'},
+      {id:'ho2', cat:'house', icon:'🏠', visual:'house', title:'Будинок 2', location:'Львівська область', area:'140 м²', marketValue:3900000, riskProbability:3.6, avgLossPercent:29, loadingPercent:23, riskLabel:'Середній ризик', riskClass:'mid'},
+      {id:'sh1', cat:'shop', icon:'🏪', visual:'shop', title:'Магазин 1', location:'центр міста', area:'110 м²', marketValue:3200000, riskProbability:4.4, avgLossPercent:31, loadingPercent:25, riskLabel:'Підвищений ризик', riskClass:'high'},
+      {id:'sh2', cat:'shop', icon:'🏪', visual:'shop', title:'Магазин 2', location:'житловий район', area:'75 м²', marketValue:2100000, riskProbability:3.8, avgLossPercent:28, loadingPercent:24, riskLabel:'Середній ризик', riskClass:'mid'},
+      {id:'wh1', cat:'warehouse', icon:'🏭', visual:'warehouse', title:'Склад 1', location:'промислова зона', area:'420 м²', marketValue:6500000, riskProbability:6.1, avgLossPercent:38, loadingPercent:29, riskLabel:'Високий ризик', riskClass:'high'},
+      {id:'wh2', cat:'warehouse', icon:'🏭', visual:'warehouse', title:'Склад 2', location:'околиця міста', area:'300 м²', marketValue:4900000, riskProbability:5.4, avgLossPercent:34, loadingPercent:27, riskLabel:'Високий ризик', riskClass:'high'}
+    ];
+
+    let selectedObject = null;
+
+    const coverageFactors = {
+      minimal: { prob: 0.95, loss: 0.90, loading: 0.95, label: 'Мінімальне покриття: частина ризиків обмежена.' },
+      standard:{ prob: 1.00, loss: 1.00, loading: 1.00, label: 'Стандартне покриття: без різких коригувань.' },
+      full:    { prob: 1.08, loss: 1.12, loading: 1.10, label: 'Повне покриття: ширше покриття і вищий платіж.' }
+    };
+
+    const termFactors = {
+      6: { prob: 0.55, loading: 0.60 },
+      12:{ prob: 1.00, loading: 1.00 }
+    };
+
+    function money(v){
+      return new Intl.NumberFormat('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+    }
+
+    function parseMoneyInput(value){
+      if (typeof value !== 'string') return NaN;
+      const cleaned = value.replace(/\s+/g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+      return cleaned ? parseFloat(cleaned) : NaN;
+    }
+
+    function formatIntegerLike(value){
+      if (value === null || value === undefined) return '';
+      const digits = String(value).replace(/\D/g, '');
+      if (!digits) return '';
+      return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Number(digits));
+    }
+
+    function attachMoneyFormatting(id){
+      const el = document.getElementById(id);
+      const formatNow = () => { el.value = formatIntegerLike(el.value); };
+      el.addEventListener('input', formatNow);
+      el.addEventListener('blur', formatNow);
+    }
+
+    function showWarning(id, text){
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      el.innerHTML = text;
+    }
+
+    function hideWarning(id){
+      const el = document.getElementById(id);
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+
+    function clearInvalids(){
+      document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
+    function markInvalid(...ids){
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('invalid');
+      });
+    }
+
+    function setStatus(cls, text){
+      const el = document.getElementById('resultStatus');
+      el.className = 'status ' + cls;
+      el.textContent = text;
+    }
+
+    function renderObjectCards(){
+      const grid = document.getElementById('objectGrid');
+      grid.innerHTML = objects.map(obj => `
+        <div class="object-card" data-id="${obj.id}">
+          <div class="object-visual ${obj.visual}">${obj.icon}</div>
+          <div class="object-body">
+            <h4>${obj.title}</h4>
+            <p><strong>Ринкова вартість:</strong> ${money(obj.marketValue)} грн</p>
+            <p><strong>Місцезнаходження:</strong> ${obj.location}</p>
+            <p><strong>Площа:</strong> ${obj.area}</p>
+            <p><strong>Базова імовірність:</strong> ${money(obj.riskProbability)}%</p>
+            <span class="badge ${obj.riskClass}">${obj.riskLabel}</span>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.object-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.object-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedObject = objects.find(o => o.id === card.dataset.id);
+          loadSelectedObject();
+        });
+      });
+    }
+
+    function loadSelectedObject(){
+      if(!selectedObject) return;
+      document.getElementById('selectedName').textContent = selectedObject.title;
+      document.getElementById('selectedLocation').textContent = selectedObject.location;
+      document.getElementById('selectedArea').textContent = selectedObject.area;
+      document.getElementById('selectedValue').textContent = money(selectedObject.marketValue) + ' грн';
+      document.getElementById('selectedProb').textContent = money(selectedObject.riskProbability) + '%';
+      document.getElementById('selectedLoss').textContent = money(selectedObject.avgLossPercent) + '% від страхової суми';
+      document.getElementById('selectedLoading').textContent = money(selectedObject.loadingPercent) + '%';
+
+      if(!document.getElementById('sumInsured').value){
+        document.getElementById('sumInsured').value = formatIntegerLike(selectedObject.marketValue);
+      }
+
+      setStatus('draft', 'Готово до розрахунку');
+      updateDynamicHints();
+    }
+
+    function updateDynamicHints(){
+      const coverage = document.getElementById('coverageLevel').value;
+      const franchise = parseFloat(document.getElementById('franchiseValue').value);
+      const coverageLabel = coverageFactors[coverage].label;
+      document.getElementById('coverageHint').textContent = coverageLabel;
+
+      let frText = '';
+      if(franchise === 0) frText = 'Нульова франшиза підвищує платіж.';
+      else if(franchise <= 10000) frText = 'Невелика франшиза трохи знижує платіж.';
+      else frText = 'Більша франшиза помітніше знижує платіж.';
+      document.getElementById('franchiseHint').textContent = frText;
+
+      if(!selectedObject) return;
+
+      const eff = calculateEffectiveParams();
+      document.getElementById('effectiveProbView').textContent = money(eff.probability) + '%';
+      document.getElementById('effectiveLossView').textContent = money(eff.avgLossPercent) + '% від страхової суми';
+      document.getElementById('effectiveLoadingView').textContent = money(eff.loadingPercent) + '%';
+    }
+
+    function calculateEffectiveParams(){
+      const coverage = document.getElementById('coverageLevel').value;
+      const franchise = parseFloat(document.getElementById('franchiseValue').value);
+      const term = document.getElementById('policyTerm').value;
+
+      const cov = coverageFactors[coverage];
+      const tf = termFactors[term];
+
+      let franchiseProbCoef = 1.00;
+      let franchiseLossCoef = 1.00;
+      let franchiseLoadingCoef = 1.00;
+
+      if(franchise === 0){
+        franchiseProbCoef = 1.00;
+        franchiseLossCoef = 1.00;
+        franchiseLoadingCoef = 1.10;
+      } else if(franchise === 5000){
+        franchiseProbCoef = 0.98;
+        franchiseLossCoef = 0.99;
+        franchiseLoadingCoef = 1.03;
+      } else if(franchise === 10000){
+        franchiseProbCoef = 0.96;
+        franchiseLossCoef = 0.97;
+        franchiseLoadingCoef = 1.00;
+      } else if(franchise === 20000){
+        franchiseProbCoef = 0.93;
+        franchiseLossCoef = 0.94;
+        franchiseLoadingCoef = 0.97;
+      } else {
+        franchiseProbCoef = 0.88;
+        franchiseLossCoef = 0.90;
+        franchiseLoadingCoef = 0.94;
+      }
+
+      const probability = selectedObject.riskProbability * cov.prob * tf.prob * franchiseProbCoef;
+      const avgLossPercent = selectedObject.avgLossPercent * cov.loss * franchiseLossCoef;
+      const loadingPercent = selectedObject.loadingPercent * cov.loading * tf.loading * franchiseLoadingCoef;
+
+      return { probability, avgLossPercent, loadingPercent };
+    }
+
+    function fillRecommended(){
+      if(!selectedObject){
+        showWarning('formWarning', 'Спочатку оберіть об’єкт страхування.');
+        return;
+      }
+      document.getElementById('sumInsured').value = formatIntegerLike(selectedObject.marketValue);
+      hideWarning('formWarning');
+      updateDynamicHints();
+    }
+
+    function validateInputs(sumInsured){
+      clearInvalids();
+      hideWarning('formWarning');
+
+      if(!selectedObject){
+        showWarning('formWarning', 'Спочатку оберіть конкретний об’єкт страхування.');
+        return false;
+      }
+      if(!isFinite(sumInsured) || sumInsured <= 0){
+        markInvalid('sumInsured');
+        showWarning('formWarning', 'Страхова сума має бути більшою за нуль.');
+        return false;
+      }
+      if(sumInsured > selectedObject.marketValue){
+        markInvalid('sumInsured');
+        showWarning('formWarning', 'Страхова сума не може перевищувати ринкову вартість об’єкта.');
+        return false;
+      }
+      return true;
+    }
+
+    function calculatePremium(){
+      const sumInsured = parseMoneyInput(document.getElementById('sumInsured').value);
+      if(!validateInputs(sumInsured)) return;
+
+      const eff = calculateEffectiveParams();
+
+      const expectedLoss = sumInsured * (eff.avgLossPercent / 100) * (eff.probability / 100);
+      const netRate = (expectedLoss / sumInsured) * 100;
+      const netPremium = expectedLoss;
+      const loadingAmount = netPremium * (eff.loadingPercent / 100);
+      const grossPremium = netPremium + loadingAmount;
+
+      document.getElementById('expectedLossView').textContent = money(expectedLoss) + ' грн';
+      document.getElementById('netRateView').textContent = money(netRate) + '%';
+      document.getElementById('netPremiumView').textContent = money(netPremium) + ' грн';
+      document.getElementById('grossPremiumView').textContent = money(grossPremium) + ' грн';
+      document.getElementById('loadingAmountView').textContent = money(loadingAmount) + ' грн';
+
+      const impacts = [];
+      const coverage = document.getElementById('coverageLevel').value;
+      const franchise = parseFloat(document.getElementById('franchiseValue').value);
+      const term = document.getElementById('policyTerm').value;
+
+      impacts.push(`${selectedObject.title} задає базову ризикову частоту ${money(selectedObject.riskProbability)}%`);
+      if(coverage === 'full') impacts.push('повне покриття підвищило платіж');
+      if(coverage === 'minimal') impacts.push('мінімальне покриття знизило платіж');
+      if(franchise === 0) impacts.push('нульова франшиза підвищила платіж');
+      if(franchise >= 20000) impacts.push('підвищена франшиза знизила платіж');
+      if(term === '6') impacts.push('строк 6 місяців знизив платіж');
+
+      document.getElementById('factorImpactView').textContent = impacts.join('; ') + '.';
+      document.getElementById('decisionNoteView').textContent =
+        'Система взяла ризикові характеристики обраного об’єкта, скоригувала їх на покриття, франшизу та строк договору, а потім обчислила нетто-ставку і страховий платіж.';
+
+      document.getElementById('logicStep1').textContent =
+        `Базова імовірність для "${selectedObject.title}" = ${money(selectedObject.riskProbability)}%\n` +
+        `Після коригування умовами договору = ${money(eff.probability)}%\n` +
+        `Середній збиток після коригування = ${money(eff.avgLossPercent)}% від страхової суми\n` +
+        `Фактичне навантаження = ${money(eff.loadingPercent)}%`;
+
+      document.getElementById('logicStep2').textContent =
+        `Очікувана виплата = страхова сума × ${money(eff.avgLossPercent)}% × ${money(eff.probability)}%\n` +
+        `${money(sumInsured)} × ${money(eff.avgLossPercent/100)} × ${money(eff.probability/100)} = ${money(expectedLoss)} грн\n\n` +
+        `Нетто-ставка = ${money(expectedLoss)} / ${money(sumInsured)} × 100 = ${money(netRate)}%`;
+
+      document.getElementById('logicStep3').textContent =
+        `Навантаження = ${money(netPremium)} × ${money(eff.loadingPercent)}% = ${money(loadingAmount)} грн`;
+
+      document.getElementById('logicStep4').textContent =
+        `Нетто-премія ${money(netPremium)} грн + навантаження ${money(loadingAmount)} грн = страховий платіж ${money(grossPremium)} грн.`;
+
+      setStatus('active', 'Розраховано');
+    }
+
+    function resetSelections(){
+      clearInvalids();
+      hideWarning('formWarning');
+      selectedObject = null;
+      document.querySelectorAll('.object-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('sumInsured').value = '';
+      document.getElementById('coverageLevel').value = 'standard';
+      document.getElementById('franchiseValue').value = '0';
+      document.getElementById('policyTerm').value = '12';
+
+      ['selectedName','selectedLocation','selectedArea','selectedValue','selectedProb','selectedLoss','selectedLoading',
+       'effectiveProbView','effectiveLossView','effectiveLoadingView',
+       'expectedLossView','netRateView','netPremiumView','grossPremiumView','loadingAmountView',
+       'factorImpactView','decisionNoteView','logicStep1','logicStep2','logicStep3','logicStep4'
+      ].forEach(id => document.getElementById(id).textContent = '—');
+
+      document.getElementById('coverageHint').textContent = 'Стандартне покриття: без різких коригувань.';
+      document.getElementById('franchiseHint').textContent = 'Менша франшиза робить поліс дорожчим.';
+      setStatus('draft', 'Оберіть об’єкт');
+    }
+
+    ['coverageLevel','franchiseValue','policyTerm'].forEach(id => {
+      document.getElementById(id).addEventListener('change', updateDynamicHints);
+    });
+
+    attachMoneyFormatting('sumInsured');
+    renderObjectCards();
+  </script>
+</body>
+</html>

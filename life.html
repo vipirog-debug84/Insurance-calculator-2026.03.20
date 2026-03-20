@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Страхування життя — навчальний модуль</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root{
+      --bg:#f4f7fb; --surface:#ffffff; --text:#13233f; --muted:#64748b; --line:#d8e1ee;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+      --successSoft:#eafcf0; --warningSoft:#fff4de; --dangerSoft:#ffe8e8; --shadow:0 16px 36px rgba(15,23,42,.08);
+    }
+    body{
+      margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text); line-height:1.45;
+      background:
+        radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),
+        var(--bg);
+    }
+    .app{max-width:1380px; margin:0 auto; padding:18px;}
+    .topbar{
+      background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#7c3aed 100%);
+      color:#fff; border-radius:26px; box-shadow:var(--shadow);
+      padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap;
+    }
+    .topbar h1{margin:0; font-size:30px;}
+    .topbar .sub{margin-top:6px; font-size:14px; color:rgba(255,255,255,.9);}
+    .top-pill{
+      display:inline-flex; align-items:center; padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.18); font-weight:800;
+    }
+    .section{
+      background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:18px; margin-bottom:18px;
+    }
+    .section.form{background:linear-gradient(180deg,#f6f9ff,#fbfcff);}
+    .section.result{background:linear-gradient(180deg,#fcfffd,#ffffff);}
+    h2{margin:0 0 6px; font-size:26px; color:#0f172a;}
+    h3{margin:0 0 12px; font-size:18px; color:#1e3a8a;}
+    .muted{color:var(--muted); font-size:14px;}
+    .program-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px;}
+    .program-card{
+      border:2px solid #dbe3f0; border-radius:20px; overflow:hidden; background:#fff; cursor:pointer; transition:.2s ease;
+      box-shadow:0 8px 18px rgba(15,23,42,.05);
+    }
+    .program-card:hover{transform:translateY(-2px); box-shadow:0 12px 24px rgba(15,23,42,.10);}
+    .program-card.selected{border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+    .program-visual{height:110px; display:flex; align-items:center; justify-content:center; font-size:46px; color:#fff; font-weight:700;}
+    .risk{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+    .survival{background:linear-gradient(135deg,#10b981,#059669);}
+    .mixed{background:linear-gradient(135deg,#3b82f6,#7c3aed);}
+    .program-body{padding:14px;}
+    .program-body h4{margin:0 0 8px; font-size:18px;}
+    .program-body p{margin:4px 0; font-size:14px; color:#334155;}
+    .badge{display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800; margin-top:10px;}
+    .badge.red{background:#ffe8e8; color:#b91c1c;}
+    .badge.green{background:#eafcf0; color:#15803d;}
+    .badge.purple{background:#f3e8ff; color:#7e22ce;}
+    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+    label{display:block; margin-bottom:6px; font-size:14px; font-weight:800; color:#22314f;}
+    input,select{
+      width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--line); font-size:15px; background:#fff; color:var(--text);
+    }
+    input:focus,select:focus{outline:none; border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+    input.invalid,select.invalid{border-color:#ef4444; box-shadow:0 0 0 4px rgba(239,68,68,.10); background:#fffafa;}
+    .hint{
+      margin-top:6px; font-size:13px; color:#475569; background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;}
+    .btn{border:none; border-radius:16px; padding:13px 18px; font-size:15px; font-weight:800; cursor:pointer;}
+    .btn.primary{color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary2)); box-shadow:0 12px 24px rgba(37,99,235,.22);}
+    .btn.secondary{background:#e8edf6; color:var(--text);}
+    .btn.ghost{background:#eef4ff; color:var(--primary);}
+    .warning-box{
+      display:none; margin-top:14px; padding:13px 14px; border-radius:14px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-weight:800;
+    }
+    .status{
+      display:inline-flex; align-items:center; padding:9px 13px; border-radius:999px; font-size:13px; font-weight:800; border:1px solid transparent; white-space:nowrap;
+    }
+    .status.draft{background:#edf2f7; color:#475569;}
+    .status.active{background:var(--successSoft); color:var(--success); border-color:#bbf7d0;}
+    .metric-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:16px;}
+    .metric{
+      border-radius:18px; padding:16px; border:1px solid #dfe7f4; background:#fff; box-shadow:0 8px 18px rgba(15,23,42,.04);
+    }
+    .metric.blue{background:linear-gradient(180deg,#eff6ff,#ffffff);}
+    .metric.orange{background:linear-gradient(180deg,#fff7ed,#ffffff);}
+    .metric.green{background:linear-gradient(180deg,#ecfdf5,#ffffff);}
+    .metric.purple{background:linear-gradient(180deg,#f3e8ff,#ffffff);}
+    .metric .title{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800;}
+    .metric .value{margin-top:8px; font-size:28px; font-weight:900; color:#0f172a;}
+    table.kv{width:100%; border-collapse:collapse;}
+    .kv td{border:1px solid #d8e0ee; padding:10px; vertical-align:top; font-size:14px;}
+    .kv td:first-child{width:44%; font-weight:800; background:#f0f6ff;}
+    .logic-steps{display:grid; gap:14px; margin-top:18px;}
+    .step{border-radius:16px; background:#fff; border:1px solid #e2e8f0; overflow:hidden;}
+    .step-head{
+      display:flex; align-items:center; gap:12px; padding:12px 14px; background:linear-gradient(180deg,#f8fbff,#fcfdff); border-bottom:1px solid #e5ebf5;
+    }
+    .step-num{
+      width:34px; height:34px; flex:0 0 34px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff;
+      display:flex; align-items:center; justify-content:center; font-weight:900;
+    }
+    .step-title{font-size:16px; font-weight:900; color:#13254a;}
+    .step-body{padding:14px;}
+    .logic-block{margin-bottom:14px;}
+    .logic-label{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:900; margin-bottom:6px;}
+    .formula-box{
+      background:#f8fbff; border:1px solid #cfe0ff; border-left:6px solid var(--primary); border-radius:14px; padding:14px; white-space:pre-line; color:#163056;
+    }
+    .note{
+      background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px; color:#334155; font-size:14px;
+    }
+    .range-wrap{display:flex; align-items:center; gap:12px;}
+    .age-box{
+      min-width:88px; text-align:center; border-radius:12px; padding:10px 12px; background:#eef4ff; font-weight:900; color:#1d4ed8; border:1px solid #cfe0ff;
+    }
+    @media (max-width:1100px){
+      .program-grid,.layout,.grid-2,.metric-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Страхування життя</h1>
+        <div class="sub">Розрахунок страхового внеску залежно від віку, статі, строку, програми та страхової суми.</div>
+      </div>
+      <div class="top-pill">Навчальний режим</div>
+    </div>
+
+    <section class="section">
+      <h2>Оберіть програму</h2>
+      <div class="muted">Кожна програма має власну базову річну ставку та логіку страхового захисту.</div>
+      <div class="program-grid" id="programGrid"></div>
+    </section>
+
+    <div class="layout">
+      <section class="section form">
+        <h2>Параметри договору</h2>
+        <div class="muted">Після вибору програми система враховує вік, стать, строк, періодичність сплати та режим виплати.</div>
+
+        <div style="margin-top:18px;">
+          <h3>Обрана програма</h3>
+          <table class="kv">
+            <tr><td>Назва програми</td><td id="selectedProgramName">—</td></tr>
+            <tr><td>Характер захисту</td><td id="selectedProgramType">—</td></tr>
+            <tr><td>Базова річна ставка</td><td id="selectedBaseRate">—</td></tr>
+            <tr><td>Короткий зміст</td><td id="selectedProgramDesc">—</td></tr>
+          </table>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Дані страхувальника</h3>
+          <div class="grid-2">
+            <div>
+              <label for="gender">Стать</label>
+              <select id="gender">
+                <option value="male">Чоловік</option>
+                <option value="female">Жінка</option>
+              </select>
+              <div class="hint" id="genderHint">Для чоловіків коефіцієнт дещо вищий.</div>
+            </div>
+            <div>
+              <label for="ageRange">Вік</label>
+              <div class="range-wrap">
+                <input id="ageRange" type="range" min="18" max="65" value="30">
+                <div class="age-box"><span id="ageValue">30</span> років</div>
+              </div>
+              <div class="hint" id="ageHint">Вік 26–35 років: базовий коефіцієнт без підвищення.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Умови договору</h3>
+          <div class="grid-2">
+            <div>
+              <label for="policyTerm">Строк страхування</label>
+              <select id="policyTerm">
+                <option value="5">5 років</option>
+                <option value="10" selected>10 років</option>
+                <option value="15">15 років</option>
+                <option value="20">20 років</option>
+              </select>
+              <div class="hint" id="termHint">10 років: базовий коефіцієнт.</div>
+            </div>
+            <div>
+              <label for="paymentFrequency">Періодичність сплати</label>
+              <select id="paymentFrequency">
+                <option value="yearly">Щороку</option>
+                <option value="quarterly">Щокварталу</option>
+                <option value="monthly" selected>Щомісяця</option>
+              </select>
+              <div class="hint" id="freqHint">Щомісячна сплата має невелике підвищення.</div>
+            </div>
+            <div>
+              <label for="sumInsured">Страхова сума, грн</label>
+              <input id="sumInsured" type="text" inputmode="numeric" placeholder="Наприклад: 500 000">
+              <div class="hint">Чим більша страхова сума, тим більший внесок.</div>
+            </div>
+            <div>
+              <label for="benefitMode">Режим виплати</label>
+              <select id="benefitMode">
+                <option value="standard" selected>Стандартний</option>
+                <option value="enhanced">Підвищений захист</option>
+              </select>
+              <div class="hint" id="benefitHint">Стандартний режим без додаткового підвищення.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Що взяла система до уваги</h3>
+          <table class="kv">
+            <tr><td>Віковий коефіцієнт</td><td id="ageCoefView">—</td></tr>
+            <tr><td>Коефіцієнт статі</td><td id="genderCoefView">—</td></tr>
+            <tr><td>Коефіцієнт строку</td><td id="termCoefView">—</td></tr>
+            <tr><td>Коефіцієнт періодичності</td><td id="freqCoefView">—</td></tr>
+            <tr><td>Коефіцієнт режиму виплати</td><td id="benefitCoefView">—</td></tr>
+          </table>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="calculateLife()">Розрахувати</button>
+          <button class="btn secondary" onclick="resetModule()">Очистити</button>
+          <button class="btn ghost" onclick="fillExample()">Заповнити приклад</button>
+        </div>
+
+        <div id="formWarning" class="warning-box"></div>
+      </section>
+
+      <section class="section result">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+          <div>
+            <h2>Результат</h2>
+            <div class="muted">Система показує орієнтовний внесок, загальну суму внесків та страхову виплату.</div>
+          </div>
+          <div id="resultStatus" class="status draft">Оберіть програму</div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric blue">
+            <div class="title">Періодичний внесок</div>
+            <div class="value" id="periodPremiumView">—</div>
+          </div>
+          <div class="metric orange">
+            <div class="title">Річний внесок</div>
+            <div class="value" id="annualPremiumView">—</div>
+          </div>
+          <div class="metric green">
+            <div class="title">Загальна сума внесків</div>
+            <div class="value" id="totalPremiumsView">—</div>
+          </div>
+          <div class="metric purple">
+            <div class="title">Страхова виплата</div>
+            <div class="value" id="payoutView">—</div>
+          </div>
+        </div>
+
+        <table class="kv">
+          <tr><td>Фактична ставка</td><td id="effectiveRateView">—</td></tr>
+          <tr><td>Що підвищило / знизило внесок</td><td id="impactView">—</td></tr>
+          <tr><td>Пояснення</td><td id="decisionNoteView">—</td></tr>
+        </table>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Хід розрахунку</h2>
+      <div class="logic-steps">
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">1</div>
+            <div class="step-title">Базова ставка програми</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Правило</div>
+              <div class="note">Кожна програма має свою базову ставку: ризикове страхування дешевше, змішане — дорожче, бо дає ширший захист.</div>
+            </div>
+            <div class="logic-block">
+              <div class="logic-label">Пояснення</div>
+              <div class="formula-box" id="logicStep1">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">2</div>
+            <div class="step-title">Коригування за віком, статтю і строком</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicStep2">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">3</div>
+            <div class="step-title">Річний і періодичний внесок</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Підстановка</div>
+              <div class="formula-box" id="logicStep3">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="step-num">4</div>
+            <div class="step-title">Підсумок</div>
+          </div>
+          <div class="step-body">
+            <div class="logic-block">
+              <div class="logic-label">Фінальний висновок</div>
+              <div class="note" id="logicStep4">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const programs = [
+      {
+        id:'risk', title:'Ризикове страхування життя', icon:'🛡️', visual:'risk', baseRate:1.2,
+        shortType:'Виплата у разі смерті',
+        desc:'Програма орієнтована на страховий захист на визначений строк. Без накопичувального елемента.',
+        badgeText:'Найдешевший варіант', badgeClass:'red'
+      },
+      {
+        id:'survival', title:'Страхування на дожиття', icon:'🌿', visual:'survival', baseRate:3.5,
+        shortType:'Виплата при дожитті',
+        desc:'Програма робить акцент на накопиченні та виплаті при дожитті до завершення строку.',
+        badgeText:'Накопичувальний акцент', badgeClass:'green'
+      },
+      {
+        id:'mixed', title:'Змішане страхування життя', icon:'⚖️', visual:'mixed', baseRate:4.2,
+        shortType:'Виплата і при дожитті, і в разі смерті',
+        desc:'Найбільш повний захист: поєднує ризиковий та накопичувальний компоненти.',
+        badgeText:'Найширший захист', badgeClass:'purple'
+      }
+    ];
+
+    const ageBands = [
+      {min:18, max:25, coef:0.85, label:'18–25 років: молодший вік, нижчий коефіцієнт.'},
+      {min:26, max:35, coef:1.00, label:'26–35 років: базовий коефіцієнт без підвищення.'},
+      {min:36, max:45, coef:1.20, label:'36–45 років: внесок підвищується.'},
+      {min:46, max:55, coef:1.50, label:'46–55 років: суттєве підвищення внеску.'},
+      {min:56, max:65, coef:1.90, label:'56–65 років: високий віковий коефіцієнт.'}
+    ];
+
+    const genderCoefs = {
+      male: {coef:1.08, label:'Для чоловіків коефіцієнт дещо вищий.'},
+      female:{coef:0.97, label:'Для жінок коефіцієнт трохи нижчий.'}
+    };
+
+    const termCoefs = {
+      5:{coef:0.95, label:'5 років: знижений строковий коефіцієнт.'},
+      10:{coef:1.00, label:'10 років: базовий коефіцієнт.'},
+      15:{coef:1.12, label:'15 років: помірне підвищення.'},
+      20:{coef:1.25, label:'20 років: вищий коефіцієнт через триваліший захист.'}
+    };
+
+    const freqCoefs = {
+      yearly:{coef:1.00, divisor:1, label:'Щорічна сплата: базовий коефіцієнт.'},
+      quarterly:{coef:1.03, divisor:4, label:'Щоквартальна сплата: невелике підвищення.'},
+      monthly:{coef:1.05, divisor:12, label:'Щомісячна сплата: невелике підвищення через частішу оплату.'}
+    };
+
+    const benefitCoefs = {
+      standard:{coef:1.00, label:'Стандартний режим без підвищення.'},
+      enhanced:{coef:1.15, label:'Підвищений захист збільшує внесок.'}
+    };
+
+    let selectedProgram = null;
+
+    function money(v){
+      return new Intl.NumberFormat('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+    }
+
+    function parseMoneyInput(value){
+      if (typeof value !== 'string') return NaN;
+      const cleaned = value.replace(/\s+/g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+      return cleaned ? parseFloat(cleaned) : NaN;
+    }
+
+    function formatIntegerLike(value){
+      if (value === null || value === undefined) return '';
+      const digits = String(value).replace(/\D/g, '');
+      if (!digits) return '';
+      return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Number(digits));
+    }
+
+    function attachMoneyFormatting(id){
+      const el = document.getElementById(id);
+      const formatNow = () => { el.value = formatIntegerLike(el.value); };
+      el.addEventListener('input', formatNow);
+      el.addEventListener('blur', formatNow);
+    }
+
+    function showWarning(id, text){
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      el.innerHTML = text;
+    }
+
+    function hideWarning(id){
+      const el = document.getElementById(id);
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+
+    function clearInvalids(){
+      document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
+    function markInvalid(...ids){
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('invalid');
+      });
+    }
+
+    function setStatus(cls, text){
+      const el = document.getElementById('resultStatus');
+      el.className = 'status ' + cls;
+      el.textContent = text;
+    }
+
+    function getAgeBand(age){
+      return ageBands.find(b => age >= b.min && age <= b.max);
+    }
+
+    function renderProgramCards(){
+      const grid = document.getElementById('programGrid');
+      grid.innerHTML = programs.map(p => `
+        <div class="program-card" data-id="${p.id}">
+          <div class="program-visual ${p.visual}">${p.icon}</div>
+          <div class="program-body">
+            <h4>${p.title}</h4>
+            <p><strong>Базова ставка:</strong> ${money(p.baseRate)}%</p>
+            <p>${p.shortType}</p>
+            <p>${p.desc}</p>
+            <span class="badge ${p.badgeClass}">${p.badgeText}</span>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.program-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.program-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedProgram = programs.find(p => p.id === card.dataset.id);
+          loadSelectedProgram();
+        });
+      });
+    }
+
+    function loadSelectedProgram(){
+      if(!selectedProgram) return;
+      document.getElementById('selectedProgramName').textContent = selectedProgram.title;
+      document.getElementById('selectedProgramType').textContent = selectedProgram.shortType;
+      document.getElementById('selectedBaseRate').textContent = money(selectedProgram.baseRate) + '%';
+      document.getElementById('selectedProgramDesc').textContent = selectedProgram.desc;
+      setStatus('draft', 'Готово до розрахунку');
+      updateDynamicHints();
+    }
+
+    function updateDynamicHints(){
+      const age = parseInt(document.getElementById('ageRange').value, 10);
+      document.getElementById('ageValue').textContent = age;
+      const ageBand = getAgeBand(age);
+      document.getElementById('ageHint').textContent = ageBand.label;
+
+      const gender = document.getElementById('gender').value;
+      document.getElementById('genderHint').textContent = genderCoefs[gender].label;
+
+      const term = document.getElementById('policyTerm').value;
+      document.getElementById('termHint').textContent = termCoefs[term].label;
+
+      const freq = document.getElementById('paymentFrequency').value;
+      document.getElementById('freqHint').textContent = freqCoefs[freq].label;
+
+      const benefit = document.getElementById('benefitMode').value;
+      document.getElementById('benefitHint').textContent = benefitCoefs[benefit].label;
+
+      document.getElementById('ageCoefView').textContent = ageBand ? ageBand.coef : '—';
+      document.getElementById('genderCoefView').textContent = genderCoefs[gender].coef;
+      document.getElementById('termCoefView').textContent = termCoefs[term].coef;
+      document.getElementById('freqCoefView').textContent = freqCoefs[freq].coef;
+      document.getElementById('benefitCoefView').textContent = benefitCoefs[benefit].coef;
+    }
+
+    function validateInputs(sumInsured){
+      clearInvalids();
+      hideWarning('formWarning');
+
+      if(!selectedProgram){
+        showWarning('formWarning', 'Спочатку оберіть програму страхування життя.');
+        return false;
+      }
+      if(!isFinite(sumInsured) || sumInsured <= 0){
+        markInvalid('sumInsured');
+        showWarning('formWarning', 'Страхова сума має бути більшою за нуль.');
+        return false;
+      }
+      if(sumInsured < 50000){
+        markInvalid('sumInsured');
+        showWarning('formWarning', 'Для навчальної моделі страхова сума має бути не меншою за 50 000 грн.');
+        return false;
+      }
+      return true;
+    }
+
+    function calculateLife(){
+      const sumInsured = parseMoneyInput(document.getElementById('sumInsured').value);
+      if(!validateInputs(sumInsured)) return;
+
+      const age = parseInt(document.getElementById('ageRange').value, 10);
+      const gender = document.getElementById('gender').value;
+      const term = document.getElementById('policyTerm').value;
+      const freq = document.getElementById('paymentFrequency').value;
+      const benefit = document.getElementById('benefitMode').value;
+
+      const ageCoef = getAgeBand(age).coef;
+      const genderCoef = genderCoefs[gender].coef;
+      const termCoef = termCoefs[term].coef;
+      const freqCoef = freqCoefs[freq].coef;
+      const divisor = freqCoefs[freq].divisor;
+      const benefitCoef = benefitCoefs[benefit].coef;
+
+      const effectiveRate = selectedProgram.baseRate * ageCoef * genderCoef * termCoef * freqCoef * benefitCoef;
+      const annualPremium = sumInsured * (effectiveRate / 100);
+      const periodPremium = annualPremium / divisor;
+      const totalPremiums = annualPremium * parseInt(term, 10);
+
+      let payout = sumInsured;
+      if(selectedProgram.id === 'survival') payout = sumInsured * 1.05;
+      if(selectedProgram.id === 'mixed') payout = sumInsured * 1.10;
+      if(selectedProgram.id === 'risk' && benefit === 'enhanced') payout = sumInsured * 1.05;
+
+      document.getElementById('periodPremiumView').textContent = money(periodPremium) + ' грн';
+      document.getElementById('annualPremiumView').textContent = money(annualPremium) + ' грн';
+      document.getElementById('totalPremiumsView').textContent = money(totalPremiums) + ' грн';
+      document.getElementById('payoutView').textContent = money(payout) + ' грн';
+      document.getElementById('effectiveRateView').textContent = money(effectiveRate) + '%';
+
+      const impacts = [];
+      if(age >= 46) impacts.push('старший вік підвищив внесок');
+      else if(age <= 25) impacts.push('молодший вік знизив внесок');
+      if(gender === 'male') impacts.push('чоловіча стать трохи підвищила внесок');
+      else impacts.push('жіноча стать трохи знизила внесок');
+      if(selectedProgram.id === 'mixed') impacts.push('змішана програма підвищила внесок');
+      if(selectedProgram.id === 'risk') impacts.push('ризикова програма зробила внесок нижчим');
+      if(term === '20') impacts.push('довший строк підвищив внесок');
+      if(freq === 'monthly') impacts.push('щомісячна сплата трохи підвищила внесок');
+      if(benefit === 'enhanced') impacts.push('підвищений режим виплати збільшив внесок');
+
+      document.getElementById('impactView').textContent = impacts.join('; ') + '.';
+      document.getElementById('decisionNoteView').textContent =
+        'Система взяла базову ставку обраної програми та скоригувала її на вік, стать, строк, періодичність сплати і режим виплати.';
+
+      document.getElementById('logicStep1').textContent =
+        `Для програми "${selectedProgram.title}" базова річна ставка = ${money(selectedProgram.baseRate)}%`;
+
+      document.getElementById('logicStep2').textContent =
+        `Фактична ставка = ${money(selectedProgram.baseRate)} × ${ageCoef} × ${genderCoef} × ${termCoef} × ${freqCoef} × ${benefitCoef}\n` +
+        `= ${money(effectiveRate)}%`;
+
+      document.getElementById('logicStep3').textContent =
+        `Річний внесок = ${money(sumInsured)} × ${money(effectiveRate)}% = ${money(annualPremium)} грн\n` +
+        `Періодичний внесок = ${money(annualPremium)} / ${divisor} = ${money(periodPremium)} грн`;
+
+      const freqLabel = freq === 'monthly' ? 'щомісячний' : (freq === 'quarterly' ? 'квартальний' : 'річний');
+      document.getElementById('logicStep4').textContent =
+        `Орієнтовний ${freqLabel} внесок становить ${money(periodPremium)} грн. ` +
+        `Загальна сума внесків за ${term} років — ${money(totalPremiums)} грн. ` +
+        `Орієнтовна страхова виплата — ${money(payout)} грн.`;
+
+      setStatus('active', 'Розраховано');
+    }
+
+    function fillExample(){
+      if(!selectedProgram){
+        selectedProgram = programs[2];
+        document.querySelectorAll('.program-card').forEach(c => c.classList.remove('selected'));
+        const mixedCard = document.querySelector('.program-card[data-id="mixed"]');
+        if (mixedCard) mixedCard.classList.add('selected');
+        loadSelectedProgram();
+      }
+      document.getElementById('gender').value = 'male';
+      document.getElementById('ageRange').value = '42';
+      document.getElementById('policyTerm').value = '15';
+      document.getElementById('paymentFrequency').value = 'monthly';
+      document.getElementById('sumInsured').value = '500 000';
+      document.getElementById('benefitMode').value = 'standard';
+      updateDynamicHints();
+    }
+
+    function resetModule(){
+      clearInvalids();
+      hideWarning('formWarning');
+      selectedProgram = null;
+      document.querySelectorAll('.program-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('gender').value = 'male';
+      document.getElementById('ageRange').value = '30';
+      document.getElementById('sumInsured').value = '';
+      document.getElementById('policyTerm').value = '10';
+      document.getElementById('paymentFrequency').value = 'monthly';
+      document.getElementById('benefitMode').value = 'standard';
+
+      ['selectedProgramName','selectedProgramType','selectedBaseRate','selectedProgramDesc',
+       'periodPremiumView','annualPremiumView','totalPremiumsView','payoutView','effectiveRateView',
+       'impactView','decisionNoteView','logicStep1','logicStep2','logicStep3','logicStep4'
+      ].forEach(id => document.getElementById(id).textContent = '—');
+
+      updateDynamicHints();
+      setStatus('draft', 'Оберіть програму');
+    }
+
+    ['gender','policyTerm','paymentFrequency','benefitMode','ageRange'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateDynamicHints);
+      document.getElementById(id).addEventListener('change', updateDynamicHints);
+    });
+
+    attachMoneyFormatting('sumInsured');
+    renderProgramCards();
+    updateDynamicHints();
+  </script>
+</body>
+</html>
