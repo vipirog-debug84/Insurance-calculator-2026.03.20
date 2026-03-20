@@ -3,660 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>КАСКО </title>
+  <title>КАСКО — навчальний емулятор v2.2</title>
   <style>
     * { box-sizing: border-box; }
     :root{
-      --bg:#f4f7fb;
-      --surface:#ffffff;
-      --text:#10203a;
-      --muted:#61708a;
-      --line:#d7deea;
-
-      --primary:#2563eb;
-      --primary-2:#7c3aed;
-      --primary-soft:#e8f0ff;
-
-      --success:#16a34a;
-      --success-soft:#e8fff0;
-
-      --warning:#d97706;
-      --warning-soft:#fff4db;
-
-      --danger:#dc2626;
-      --danger-soft:#ffe8e8;
-
-      --shadow:0 14px 34px rgba(17,24,39,.08);
-      --radius:18px;
-    }
-
-    body{
-      margin:0;
-      font-family: Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
-        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),
-        var(--bg);
-      color:var(--text);
-      line-height:1.45;
-    }
-
-    .app{
-      max-width:1280px;
-      margin:0 auto;
-      padding:18px;
-    }
-
-    .topbar{
-      background:linear-gradient(135deg, #1d4ed8 0%, #2563eb 48%, #7c3aed 100%);
-      color:#fff;
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:22px 24px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-    }
-
-    .topbar h1{
-      margin:0;
-      font-size:30px;
-      letter-spacing:.01em;
-    }
-
-    .topbar .sub{
-      margin-top:6px;
-      color:rgba(255,255,255,.88);
-      font-size:14px;
-    }
-
-    .header-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.24);
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .layout{
-      display:grid;
-      grid-template-columns:280px 1fr;
-      gap:18px;
-    }
-
-    .sidebar, .content{
-      background:var(--surface);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-
-    .sidebar{
-      padding:14px;
-      position:sticky;
-      top:18px;
-      height:fit-content;
-    }
-
-    .nav-title{
-      margin:6px 10px 12px;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .nav-btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      text-align:left;
-      padding:14px 14px;
-      margin-bottom:8px;
-      border-radius:14px;
-      background:#eef3fb;
-      color:var(--text);
-      font-size:15px;
-      font-weight:700;
-      transition:.18s ease;
-    }
-
-    .nav-btn:hover{ transform:translateY(-1px); }
-
-    .nav-btn.active{
-      color:#fff;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 10px 22px rgba(37,99,235,.24);
-    }
-
-    .nav-help{
-      margin:12px 8px 4px;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .content{
-      padding:20px;
-    }
-
-    .screen{ display:none; }
-    .screen.active{ display:block; }
-
-    .screen-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:16px;
-      flex-wrap:wrap;
-    }
-
-    h2{
-      margin:0;
-      font-size:26px;
-      color:#0f172a;
-    }
-
-    .screen-desc{
-      margin-top:6px;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .status{
-      display:inline-flex;
-      align-items:center;
-      padding:9px 13px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:800;
-      white-space:nowrap;
-      border:1px solid transparent;
-    }
-
-    .status.draft{
-      background:#edf2f7;
-      color:#475569;
-    }
-    .status.active{
-      background:var(--success-soft);
-      color:var(--success);
-      border-color:#bbf7d0;
-    }
-    .status.warning{
-      background:var(--warning-soft);
-      color:var(--warning);
-      border-color:#fde68a;
-    }
-    .status.denied{
-      background:var(--danger-soft);
-      color:var(--danger);
-      border-color:#fecaca;
-    }
-
-    .section{
-      background:#fbfcfe;
-      border:1px solid #e6ebf4;
-      border-radius:18px;
-      padding:16px;
-      margin-bottom:16px;
-    }
-
-    .section.color-policy{
-      background:linear-gradient(180deg, #f6f9ff 0%, #fbfcff 100%);
-      border-color:#dce7fb;
-    }
-    .section.color-claim{
-      background:linear-gradient(180deg, #fffaf0 0%, #fffdf8 100%);
-      border-color:#fde6b6;
-    }
-    .section.color-decision{
-      background:linear-gradient(180deg, #f0fff7 0%, #fcfffd 100%);
-      border-color:#c7f3d9;
-    }
-
-    .section h3{
-      margin:0 0 12px;
-      font-size:18px;
-      color:#1e3a8a;
-    }
-
-    .grid-2, .grid-3, .grid-4{
-      display:grid;
-      gap:16px;
-    }
-    .grid-2{ grid-template-columns:repeat(2,1fr); }
-    .grid-3{ grid-template-columns:repeat(3,1fr); }
-    .grid-4{ grid-template-columns:repeat(4,1fr); }
-
-    label{
-      display:block;
-      margin-bottom:6px;
-      font-size:14px;
-      font-weight:700;
-      color:#22314f;
-    }
-
-    input, select, textarea{
-      width:100%;
-      padding:12px 13px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      font-size:15px;
-      transition:.15s ease;
-    }
-
-    input:focus, select:focus, textarea:focus{
-      outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
-    }
-
-    input.invalid, select.invalid, textarea.invalid{
-      border-color:#ef4444;
-      box-shadow:0 0 0 4px rgba(239,68,68,.10);
-      background:#fffafa;
-    }
-
-    textarea{
-      min-height:96px;
-      resize:vertical;
-    }
-
-    .checks{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      padding-top:4px;
-    }
-
-    .check{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-weight:700;
-      background:#fff;
-      border:1px solid #dbe4f1;
-      border-radius:999px;
-      padding:10px 14px;
-    }
-    .check input{ width:auto; }
-
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .btn{
-      border:none;
-      border-radius:14px;
-      padding:12px 18px;
-      font-size:15px;
-      font-weight:800;
-      cursor:pointer;
-      transition:.18s ease;
-    }
-    .btn:hover{ transform:translateY(-1px); }
-
-    .btn.primary{
-      color:#fff;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 12px 24px rgba(37,99,235,.22);
-    }
-    .btn.secondary{
-      background:#e8edf6;
-      color:var(--text);
-    }
-    .btn.ghost{
-      background:#eef4ff;
-      color:var(--primary);
-    }
-
-    .warning-box{
-      display:none;
-      margin-top:14px;
-      border-radius:14px;
-      background:#fff7ed;
-      border:1px solid #fdba74;
-      color:#9a3412;
-      padding:13px 14px;
-      font-weight:700;
-    }
-
-    .two-col{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:18px;
-    }
-
-    .preview-card{
-      background:#ffffff;
-      border:1px solid #dbe6fb;
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:0 12px 28px rgba(37,99,235,.08);
-    }
-
-    .preview-head{
-      background:linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #7c3aed 100%);
-      color:#fff;
-      padding:16px 18px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-
-    .preview-head h3{
-      margin:0;
-      color:#fff;
-      font-size:20px;
-    }
-
-    .preview-body{
-      padding:16px;
-      background:#fff;
-    }
-
-    table.kv{
-      width:100%;
-      border-collapse:collapse;
-    }
-    .kv td{
-      border:1px solid #d8e0ee;
-      padding:10px;
-      vertical-align:top;
-      font-size:14px;
-    }
-    .kv td:first-child{
-      width:40%;
-      font-weight:700;
-      background:#f0f6ff;
-    }
-
-    .money-big{
-      font-size:34px;
-      line-height:1;
-      font-weight:900;
-      color:#1d4ed8;
-      margin:14px 0 4px;
-      letter-spacing:-.02em;
-    }
-
-    .money-label{
-      color:var(--muted);
-      font-size:14px;
-      font-weight:700;
-    }
-
-    .result-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:16px;
-      margin-bottom:16px;
-    }
-
-    .metric{
-      border-radius:18px;
-      padding:16px;
-      background:#fff;
-      border:1px solid #dfe7f4;
-      box-shadow:0 8px 18px rgba(15,23,42,.04);
-    }
-    .metric.blue{ background:linear-gradient(180deg,#eff6ff,#ffffff); }
-    .metric.orange{ background:linear-gradient(180deg,#fff7ed,#ffffff); }
-    .metric.green{ background:linear-gradient(180deg,#ecfdf5,#ffffff); }
-
-    .metric .title{
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      color:var(--muted);
-      font-weight:800;
-    }
-    .metric .value{
-      margin-top:8px;
-      font-size:30px;
-      font-weight:900;
-      color:#0f172a;
-    }
-
-    .logic-steps{
-      display:grid;
-      gap:14px;
-      margin-top:8px;
-    }
-
-    .step{
-      border-radius:16px;
-      background:#fff;
-      border:1px solid #e2e8f0;
-      overflow:hidden;
-    }
-
-    .step-head{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:12px 14px;
-      background:linear-gradient(180deg,#f8fbff,#fdfefe);
-      border-bottom:1px solid #e5ebf5;
-    }
-
-    .step-num{
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      flex:0 0 34px;
-    }
-
-    .step-head-title{
-      font-size:16px;
-      font-weight:800;
-      color:#13254a;
-    }
-
-    .step-body{
-      padding:14px;
-      background:#fff;
-    }
-
-    .logic-block{
-      margin-bottom:14px;
-    }
-
-    .logic-label{
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      color:var(--muted);
-      font-weight:800;
-      margin-bottom:6px;
-    }
-
-    .formula-box{
-      background:#f8fbff;
-      border:1px solid #cfe0ff;
-      border-left:6px solid var(--primary);
-      border-radius:14px;
-      padding:14px;
-      font-family:"Courier New", monospace;
-      white-space:pre-line;
-      color:#163056;
-    }
-
-    .note{
-      background:#f9fafb;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      padding:12px;
-      color:#334155;
-      font-size:14px;
-    }
-
-    .muted{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .hidden{ display:none; }
-
-    @media (max-width: 980px){
-      .layout{ grid-template-columns:1fr; }
-      .sidebar{ position:static; }
-      .two-col, .grid-2, .grid-3, .grid-4, .result-grid{ grid-template-columns:1fr; }
-      .sidebar .nav-title, .sidebar .nav-help{ display:none; }
-      .sidebar{ padding:10px; }
-      .nav-row{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:8px;
-      }
-      .nav-btn{
-        text-align:center;
-        margin:0;
-        padding:11px 8px;
-        font-size:13px;
-      }
-    }
+      --bg:#f4f7fb; --surface:#ffffff; --text:#13233f; --muted:#64748b; --line:#d8e1ee;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+      --successSoft:#eafcf0; --warningSoft:#fff4de; --dangerSoft:#ffe8e8; --shadow:0 16px 36px rgba(15,23,42,.08); --radius:20px;
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:
+      radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
+      radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),var(--bg);line-height:1.45;}
+    .app{max-width:1280px;margin:0 auto;padding:18px;}
+    .topbar{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#7c3aed 100%);color:#fff;border-radius:26px;box-shadow:var(--shadow);padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+    .topbar h1{margin:0;font-size:30px;}.topbar .sub{margin-top:6px;font-size:14px;color:rgba(255,255,255,.9);} .top-pill{display:inline-flex;align-items:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.18);font-weight:800;white-space:nowrap;}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;}.sidebar,.content{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);} .sidebar{padding:14px;height:fit-content;position:sticky;top:18px;} .side-title{margin:6px 10px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;}
+    .nav-btn{width:100%;text-align:left;border:none;cursor:pointer;border-radius:16px;padding:14px;margin-bottom:8px;background:#eef3fb;color:var(--text);font-size:15px;font-weight:800;transition:.18s ease;} .nav-btn.active{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 12px 26px rgba(37,99,235,.22);} .nav-help{margin:12px 8px 2px;color:var(--muted);font-size:13px;}
+    .content{padding:20px;}.screen{display:none;} .screen.active{display:block;} .screen-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap;} h2{margin:0;font-size:26px;color:#0f172a;} .screen-desc{margin-top:6px;font-size:14px;color:var(--muted);} 
+    .status{display:inline-flex;align-items:center;padding:9px 13px;border-radius:999px;font-size:13px;font-weight:800;border:1px solid transparent;white-space:nowrap;} .status.draft{background:#edf2f7;color:#475569;} .status.active{background:var(--successSoft);color:var(--success);border-color:#bbf7d0;} .status.warning{background:var(--warningSoft);color:var(--warning);border-color:#fde68a;} .status.denied{background:var(--dangerSoft);color:var(--danger);border-color:#fecaca;}
+    .section{background:#fbfcfe;border:1px solid #e6edf7;border-radius:18px;padding:16px;margin-bottom:16px;} .section.policy{background:linear-gradient(180deg,#f6f9ff,#fbfcff);border-color:#dbe7fb;} .section.claim{background:linear-gradient(180deg,#fff9ef,#fffdf8);border-color:#fde7bb;} .section.decision{background:linear-gradient(180deg,#f0fff7,#fcfffd);border-color:#cbf0db;} .section h3{margin:0 0 12px;font-size:18px;color:#1e3a8a;}
+    .grid-2,.grid-3,.grid-4{display:grid;gap:16px;} .grid-2{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(3,1fr);} .grid-4{grid-template-columns:repeat(4,1fr);} .wizard-top{display:none;margin-bottom:14px;gap:8px;} .wizard-step{flex:1;text-align:center;border-radius:14px;padding:10px 8px;font-size:13px;font-weight:800;background:#eef3fb;color:#334155;} .wizard-step.active{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));}
+    label{display:block;margin-bottom:6px;font-size:14px;font-weight:800;color:#22314f;} input,select,textarea{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--text);transition:.15s ease;} input:focus,select:focus,textarea:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.12);} input.invalid,select.invalid,textarea.invalid{border-color:#ef4444;box-shadow:0 0 0 4px rgba(239,68,68,.10);background:#fffafa;} textarea{min-height:96px;resize:vertical;}
+    .checks,.toggle-row{display:flex;flex-wrap:wrap;gap:12px;padding-top:4px;} .check,.toggle{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#fff;border:1px solid #dce5f2;font-weight:800;} .check input,.toggle input{width:auto;}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;} .btn{border:none;border-radius:16px;padding:13px 18px;font-size:15px;font-weight:800;cursor:pointer;transition:.18s ease;} .btn.primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 12px 24px rgba(37,99,235,.22);} .btn.secondary{background:#e8edf6;color:var(--text);} .btn.ghost{background:#eef4ff;color:var(--primary);} .warning-box{display:none;margin-top:14px;padding:13px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;font-weight:800;}
+    .two-col{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;} .preview-card{background:#fff;border:1px solid #dbe6fb;border-radius:22px;overflow:hidden;box-shadow:0 12px 28px rgba(37,99,235,.08);} .preview-head{padding:16px 18px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 45%,#7c3aed 100%);color:#fff;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;} .preview-head h3{margin:0;font-size:20px;color:#fff;} .preview-body{padding:16px;background:#fff;}
+    table.kv{width:100%;border-collapse:collapse;} .kv td{border:1px solid #d8e0ee;padding:10px;vertical-align:top;font-size:14px;} .kv td:first-child{width:40%;font-weight:800;background:#f0f6ff;} .money-big{margin:14px 0 4px;font-size:34px;font-weight:900;line-height:1;letter-spacing:-.02em;color:#1d4ed8;} .money-label{color:var(--muted);font-size:14px;font-weight:800;}
+    .sticky-summary{display:none;position:sticky;bottom:0;margin-top:16px;padding:14px 16px;border-radius:18px 18px 0 0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;box-shadow:0 -8px 24px rgba(37,99,235,.2);} .sticky-summary .small{font-size:13px;opacity:.9;} .sticky-summary .big{font-size:22px;font-weight:900;margin-top:4px;}
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;} .metric{border-radius:18px;padding:16px;border:1px solid #dfe7f4;background:#fff;box-shadow:0 8px 18px rgba(15,23,42,.04);} .metric.blue{background:linear-gradient(180deg,#eff6ff,#ffffff);} .metric.orange{background:linear-gradient(180deg,#fff7ed,#ffffff);} .metric.green{background:linear-gradient(180deg,#ecfdf5,#ffffff);} .metric .title{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;} .metric .value{margin-top:8px;font-size:30px;font-weight:900;color:#0f172a;}
+    .logic-steps{display:grid;gap:14px;margin-top:8px;} .step{border-radius:16px;background:#fff;border:1px solid #e2e8f0;overflow:hidden;} .step-head{display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(180deg,#f8fbff,#fcfdff);border-bottom:1px solid #e5ebf5;} .step-num{width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;} .step-title{font-size:16px;font-weight:900;color:#13254a;} .step-body{padding:14px;} .logic-block{margin-bottom:14px;} .logic-label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:900;margin-bottom:6px;} .formula-box{background:#f8fbff;border:1px solid #cfe0ff;border-left:6px solid var(--primary);border-radius:14px;padding:14px;font-family:"Courier New",monospace;white-space:pre-line;color:#163056;} .note{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:12px;color:#334155;font-size:14px;}
+    .hint{margin-top:6px;font-size:13px;color:#475569;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px;} .good{color:#15803d;font-weight:800;} .bad{color:#b45309;font-weight:800;} .neutral{color:#334155;font-weight:800;}
+    .hidden{display:none;} .muted{color:var(--muted);font-size:14px;}
+    @media (max-width:980px){ .layout{grid-template-columns:1fr;} .sidebar{position:static;} .two-col,.grid-2,.grid-3,.grid-4,.result-grid{grid-template-columns:1fr;} .sidebar .side-title,.sidebar .nav-help{display:none;} .sidebar{padding:10px;} .nav-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;} .nav-btn{margin:0;text-align:center;font-size:13px;padding:11px 8px;} .wizard-top{display:flex;} .sticky-summary{display:block;} }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="topbar">
       <div>
-        <h1>КАСКО — навчальний емулятор</h1>
-        <div class="sub">Поліс → Страховий випадок → Виплата. Мобільна адаптація та повний хід розрахунку.</div>
+        <h1>КАСКО — навчальний емулятор v2.2</h1>
+        <div class="sub">Біля кожного параметра, що впливає на тариф, одразу видно коефіцієнт або відсоток.</div>
       </div>
-      <div class="header-pill">Навчальний режим</div>
+      <div class="top-pill">Навчальний режим</div>
     </div>
 
     <div class="layout">
       <aside class="sidebar">
-        <div class="nav-title">Екрани</div>
+        <div class="side-title">Етапи</div>
         <div class="nav-row">
           <button class="nav-btn active" data-screen="policyScreen">Поліс</button>
           <button class="nav-btn" data-screen="claimScreen">Подія</button>
           <button class="nav-btn" data-screen="decisionScreen">Виплата</button>
         </div>
-        <div class="nav-help">На телефоні це покроковий сценарій. На комп’ютері — робоча панель.</div>
+        <div class="nav-help">На мобільному це покроковий сценарій.</div>
       </aside>
 
       <main class="content">
-        <!-- SCREEN 1 -->
+        <div class="wizard-top">
+          <div class="wizard-step active" id="wiz1">1. Поліс</div>
+          <div class="wizard-step" id="wiz2">2. Подія</div>
+          <div class="wizard-step" id="wiz3">3. Виплата</div>
+        </div>
+
         <section class="screen active" id="policyScreen">
           <div class="screen-head">
             <div>
               <h2>Оформлення поліса</h2>
-              <div class="screen-desc">Введіть дані клієнта, виберіть автомобіль та умови страхування.</div>
+              <div class="screen-desc">Заповніть анкету, оберіть покриття та одразу дивіться, що і як впливає на тариф.</div>
             </div>
             <div id="policyStatus" class="status draft">Чернетка</div>
           </div>
 
           <div class="two-col">
             <div>
-              <div class="section color-policy">
+              <div class="section policy">
                 <h3>Страхувальник</h3>
-                <div class="grid-2">
-                  <div>
-                    <label for="clientName">ПІБ клієнта</label>
-                    <input id="clientName" type="text" placeholder="Наприклад: Вікторія Павленко">
-                  </div>
-                  <div>
-                    <label for="clientType">Тип клієнта</label>
-                    <select id="clientType">
-                      <option value="Фізична особа">Фізична особа</option>
-                      <option value="Юридична особа">Юридична особа</option>
-                    </select>
-                  </div>
+                <div class="grid-3">
+                  <div><label for="clientName">ПІБ клієнта</label><input id="clientName" type="text" placeholder="Наприклад: Віктор Пиріг"></div>
+                  <div><label for="clientType">Тип клієнта</label><select id="clientType"><option value="Фізична особа">Фізична особа</option><option value="Юридична особа">Юридична особа</option></select></div>
+                  <div><label for="driverAge">Вік страхувальника</label><input id="driverAge" type="number" min="18" max="90" value="35"><div class="hint" id="hintDriverAge">Коефіцієнт: —</div></div>
                 </div>
               </div>
 
-              <div class="section color-policy">
-                <h3>Транспортний засіб</h3>
-                <div class="grid-2">
-                  <div>
-                    <label for="carBrand">Марка</label>
-                    <select id="carBrand"></select>
-                  </div>
-                  <div>
-                    <label for="carModel">Модель</label>
-                    <select id="carModel"></select>
-                  </div>
-                  <div>
-                    <label for="carYear">Рік випуску</label>
-                    <input id="carYear" type="number" min="2000" max="2026" value="2022">
-                  </div>
-                  <div>
-                    <label for="carSegment">Сегмент</label>
-                    <input id="carSegment" type="text" readonly>
-                  </div>
-                  <div>
-                    <label for="marketValue">Орієнтовна ринкова вартість, грн</label>
-                    <input id="marketValue" type="number" min="1" step="0.01">
-                  </div>
-                  <div>
-                    <label for="insuredSum">Страхова сума, грн</label>
-                    <input id="insuredSum" type="number" min="1" step="0.01">
-                  </div>
+              <div class="section policy">
+                <h3>Автомобіль</h3>
+                <div class="grid-3">
+                  <div><label for="carBrand">Марка</label><select id="carBrand"></select></div>
+                  <div><label for="carModel">Модель</label><select id="carModel"></select></div>
+                  <div><label for="carYear">Рік випуску</label><input id="carYear" type="number" min="2000" max="2026" value="2022"><div class="hint" id="hintCarYear">Коефіцієнт: —</div></div>
+                  <div><label for="plateNumber">Держномер</label><input id="plateNumber" type="text" placeholder="AA1234BC"></div>
+                  <div><label for="cityReg">Місто реєстрації</label><select id="cityReg"><option value="Київ">Київ</option><option value="Львів">Львів</option><option value="Одеса">Одеса</option><option value="Дніпро">Дніпро</option><option value="Харків">Харків</option><option value="Інше місто">Інше місто</option></select><div class="hint" id="hintCity">Коефіцієнт: —</div></div>
+                  <div><label for="carSegment">Сегмент</label><input id="carSegment" type="text" readonly></div>
+                  <div><label for="marketValue">Орієнтовна ринкова вартість, грн</label><input id="marketValue" type="text" inputmode="numeric" placeholder="Наприклад: 1 000 000"></div>
+                  <div><label for="insuredSum">Страхова сума, грн</label><input id="insuredSum" type="text" inputmode="numeric" placeholder="Наприклад: 900 000"></div>
+                </div>
+                <div class="toggle-row" style="margin-top:16px;">
+                  <label class="toggle"><input type="checkbox" id="isCredit"> Авто в кредиті</label>
+                  <label class="toggle"><input type="checkbox" id="isTaxi"> Використовується в таксі</label>
+                </div>
+                <div class="grid-2" style="margin-top:12px;">
+                  <div class="hint" id="hintCredit">Коефіцієнт кредиту: —</div>
+                  <div class="hint" id="hintTaxi">Коефіцієнт таксі: —</div>
                 </div>
               </div>
 
-              <div class="section color-policy">
-                <h3>Умови страхування</h3>
-                <div class="checks">
-                  <label class="check"><input type="checkbox" id="riskDtp" checked> ДТП</label>
-                  <label class="check"><input type="checkbox" id="riskNature"> Стихійне лихо</label>
-                  <label class="check"><input type="checkbox" id="riskTheft"> Викрадення</label>
+              <div class="section policy">
+                <h3>Умови поліса</h3>
+                <div class="grid-3">
+                  <div><label for="policyStart">Дата початку дії</label><input id="policyStart" type="date"></div>
+                  <div><label for="policyTerm">Строк страхування</label><select id="policyTerm"><option value="6">6 місяців</option><option value="12" selected>12 місяців</option></select></div>
+                  <div><label for="policyEnd">Дата закінчення</label><input id="policyEnd" type="text" readonly></div>
                 </div>
+
+                <div class="checks" style="margin-top:16px;">
+                  <label class="check"><input type="checkbox" id="riskDtp" checked> ДТП (3,00%)</label>
+                  <label class="check"><input type="checkbox" id="riskNature"> Стихійне лихо (0,30%)</label>
+                  <label class="check"><input type="checkbox" id="riskTheft"> Викрадення (4,80%)</label>
+                </div>
+                <div class="hint" id="hintRisks" style="margin-top:12px;">Базовий тариф за ризиками: —</div>
 
                 <div class="grid-4" style="margin-top:16px;">
-                  <div>
-                    <label for="franchiseType">Тип франшизи</label>
-                    <select id="franchiseType">
-                      <option value="none">Без франшизи</option>
-                      <option value="conditional">Умовна</option>
-                      <option value="unconditional">Безумовна</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="franchiseValue">Франшиза, грн</label>
-                    <input id="franchiseValue" type="number" min="0" step="0.01" value="0">
-                  </div>
-                  <div>
-                    <label for="discount">Знижка, %</label>
-                    <input id="discount" type="number" min="0" max="30" step="0.01" value="0">
-                  </div>
-                  <div>
-                    <label for="bonusMalus">Бонус-малус</label>
-                    <input id="bonusMalus" type="number" min="0.5" max="2" step="0.01" value="1">
-                  </div>
+                  <div><label for="franchiseType">Тип франшизи</label><select id="franchiseType"><option value="none">Без франшизи</option><option value="conditional">Умовна</option><option value="unconditional">Безумовна</option></select></div>
+                  <div><label for="franchiseValue">Франшиза, грн</label><input id="franchiseValue" type="text" inputmode="numeric" value="0" placeholder="Наприклад: 20 000"></div>
+                  <div><label for="discount">Знижка, %</label><input id="discount" type="number" min="0" max="30" step="0.01" value="0"><div class="hint" id="hintDiscount">Знижка: —</div></div>
+                  <div><label for="insuranceHistory">Страхова історія</label><select id="insuranceHistory"></select><div class="hint" id="hintHistory">Коефіцієнт: —</div></div>
                 </div>
               </div>
 
               <div class="actions">
                 <button class="btn primary" onclick="createPolicy()">Сформувати поліс</button>
                 <button class="btn secondary" onclick="resetPolicyForm()">Очистити</button>
-                <button class="btn ghost" onclick="updatePolicyPreview()">Оновити перегляд</button>
+                <button class="btn ghost" onclick="fillDemo()">Заповнити приклад</button>
               </div>
               <div id="policyWarning" class="warning-box"></div>
+
+              <div class="sticky-summary"><div class="small">Поточний страховий платіж</div><div class="big" id="premiumSticky">—</div></div>
             </div>
 
             <div>
@@ -664,7 +144,7 @@
                 <div class="preview-head">
                   <div>
                     <h3>Попередній перегляд поліса</h3>
-                    <div class="muted" style="color:rgba(255,255,255,.88);">Документ оновлюється в реальному часі.</div>
+                    <div class="muted" style="color:rgba(255,255,255,.9);">Формується автоматично на основі введених даних.</div>
                   </div>
                   <div id="policyPreviewStatus" class="status draft">Чернетка</div>
                 </div>
@@ -672,16 +152,19 @@
                   <table class="kv">
                     <tr><td>Номер поліса</td><td id="policyNumberView">—</td></tr>
                     <tr><td>Дата оформлення</td><td id="policyDateView">—</td></tr>
+                    <tr><td>Період дії</td><td id="policyPeriodView">—</td></tr>
                     <tr><td>Страхувальник</td><td id="clientView">—</td></tr>
                     <tr><td>Тип клієнта</td><td id="clientTypeView">—</td></tr>
                     <tr><td>Автомобіль</td><td id="carView">—</td></tr>
+                    <tr><td>Держномер</td><td id="plateView">—</td></tr>
+                    <tr><td>Місто реєстрації</td><td id="cityView">—</td></tr>
                     <tr><td>Сегмент</td><td id="segmentView">—</td></tr>
                     <tr><td>Ринкова вартість</td><td id="marketValueView">—</td></tr>
                     <tr><td>Страхова сума</td><td id="insuredSumView">—</td></tr>
                     <tr><td>Ризики</td><td id="risksView">—</td></tr>
                     <tr><td>Франшиза</td><td id="franchiseView">—</td></tr>
-                    <tr><td>Знижка / Бонус-малус</td><td id="discountView">—</td></tr>
-                    <tr><td>Коефіцієнт віку авто</td><td id="ageCoefView">—</td></tr>
+                    <tr><td>Історія / коефіцієнт</td><td id="historyView">—</td></tr>
+                    <tr><td>Коефіцієнти</td><td id="coefView">—</td></tr>
                     <tr><td>Сукупний тариф</td><td id="tariffView">—</td></tr>
                   </table>
                   <div class="money-big" id="premiumView">—</div>
@@ -690,196 +173,38 @@
               </div>
             </div>
           </div>
+
+          <div class="section policy">
+            <h3>Механіка формування страхового тарифу</h3>
+            <div class="result-grid">
+              <div class="metric blue"><div class="title">Базовий тариф</div><div class="value" id="tariffBaseValue">—</div></div>
+              <div class="metric orange"><div class="title">Підсумковий тариф</div><div class="value" id="tariffFinalValue">—</div></div>
+              <div class="metric green"><div class="title">Страховий платіж</div><div class="value" id="tariffPremiumValue">—</div></div>
+            </div>
+            <div class="logic-steps">
+              <div class="step"><div class="step-head"><div class="step-num">1</div><div class="step-title">Базовий тариф за обраними ризиками</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Правило</div><div class="note">Базовий тариф формується як сума тарифів за всіма обраними страховими ризиками.</div></div><div class="logic-block"><div class="logic-label">Підстановка</div><div class="formula-box" id="tariffStep1">—</div></div></div></div>
+              <div class="step"><div class="step-head"><div class="step-num">2</div><div class="step-title">Коригуючі коефіцієнти</div></div><div class="step-body"><table class="kv"><tr><td>Вік авто</td><td id="coefAgeAuto">—</td></tr><tr><td>Місто реєстрації</td><td id="coefCity">—</td></tr><tr><td>Вік страхувальника</td><td id="coefDriverAge">—</td></tr><tr><td>Таксі</td><td id="coefTaxi">—</td></tr><tr><td>Кредит</td><td id="coefCredit">—</td></tr><tr><td>Страхова історія</td><td id="coefHistory">—</td></tr><tr><td>Знижка</td><td id="coefDiscount">—</td></tr></table></div></div>
+              <div class="step"><div class="step-head"><div class="step-num">3</div><div class="step-title">Формула підсумкового тарифу</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Формула</div><div class="formula-box">Підсумковий тариф =
+Базовий тариф × Коеф. віку авто × Коеф. міста × Коеф. віку страхувальника × Коеф. таксі × Коеф. кредиту × Коеф. страхової історії × (1 − знижка)</div></div><div class="logic-block"><div class="logic-label">Підстановка</div><div class="formula-box" id="tariffStep3">—</div></div></div></div>
+              <div class="step"><div class="step-head"><div class="step-num">4</div><div class="step-title">Розрахунок страхового платежу</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Формула</div><div class="formula-box">Страховий платіж = Страхова сума × Підсумковий тариф / 100</div></div><div class="logic-block"><div class="logic-label">Підстановка</div><div class="formula-box" id="tariffStep4">—</div></div></div></div>
+            </div>
+          </div>
         </section>
 
-        <!-- SCREEN 2 -->
         <section class="screen" id="claimScreen">
-          <div class="screen-head">
-            <div>
-              <h2>Реєстрація страхового випадку</h2>
-              <div class="screen-desc">Перевіряємо, чи входить подія до покриття, і готуємо справу до розрахунку.</div>
-            </div>
-            <div id="claimStateBadge" class="status draft">Очікує введення</div>
-          </div>
-
-          <div class="section color-claim">
-            <h3>Дані поліса</h3>
-            <table class="kv">
-              <tr><td>Номер поліса</td><td id="claimPolicyNumber">—</td></tr>
-              <tr><td>Автомобіль</td><td id="claimCarView">—</td></tr>
-              <tr><td>Покриті ризики</td><td id="claimRisksView">—</td></tr>
-              <tr><td>Франшиза</td><td id="claimFranchiseView">—</td></tr>
-            </table>
-          </div>
-
-          <div class="section color-claim">
-            <h3>Дані події</h3>
-            <div class="grid-2">
-              <div>
-                <label for="claimDate">Дата події</label>
-                <input id="claimDate" type="date">
-              </div>
-              <div>
-                <label for="claimType">Вид події</label>
-                <select id="claimType">
-                  <option value="ДТП">ДТП</option>
-                  <option value="Стихійне лихо">Стихійне лихо</option>
-                  <option value="Викрадення">Викрадення</option>
-                </select>
-              </div>
-              <div>
-                <label for="damageAmount">Сума збитку / ремонту, грн</label>
-                <input id="damageAmount" type="number" min="1" step="0.01">
-              </div>
-            </div>
-            <div style="margin-top:16px;">
-              <label for="claimDescription">Короткий опис події</label>
-              <textarea id="claimDescription" placeholder="Наприклад: пошкодження переднього бампера та лівого крила"></textarea>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn primary" onclick="registerClaim()">Зареєструвати випадок</button>
-            <button class="btn secondary" onclick="resetClaimForm()">Очистити</button>
-          </div>
+          <div class="screen-head"><div><h2>Реєстрація страхового випадку</h2><div class="screen-desc">Перевіряємо, чи входить подія до покриття і чи діє поліс на дату події.</div></div><div id="claimStateBadge" class="status draft">Очікує введення</div></div>
+          <div class="section claim"><h3>Дані поліса</h3><table class="kv"><tr><td>Номер поліса</td><td id="claimPolicyNumber">—</td></tr><tr><td>Автомобіль</td><td id="claimCarView">—</td></tr><tr><td>Період дії</td><td id="claimPeriodView">—</td></tr><tr><td>Покриті ризики</td><td id="claimRisksView">—</td></tr><tr><td>Франшиза</td><td id="claimFranchiseView">—</td></tr></table></div>
+          <div class="section claim"><h3>Дані події</h3><div class="grid-2"><div><label for="claimDate">Дата події</label><input id="claimDate" type="date"></div><div><label for="claimType">Вид події</label><select id="claimType"><option value="ДТП">ДТП</option><option value="Стихійне лихо">Стихійне лихо</option><option value="Викрадення">Викрадення</option></select></div><div><label for="damageAmount">Сума збитку / ремонту, грн</label><input id="damageAmount" type="text" inputmode="numeric" placeholder="Наприклад: 150 000"></div></div><div style="margin-top:16px;"><label for="claimDescription">Короткий опис події</label><textarea id="claimDescription" placeholder="Наприклад: пошкодження переднього бампера та лівого крила"></textarea></div></div>
+          <div class="actions"><button class="btn primary" onclick="registerClaim()">Зареєструвати випадок</button><button class="btn secondary" onclick="resetClaimForm()">Очистити</button></div>
           <div id="claimWarning" class="warning-box"></div>
-
-          <div class="section hidden" id="claimResultBox">
-            <h3>Результат перевірки події</h3>
-            <table class="kv">
-              <tr><td>Вид події</td><td id="registeredClaimType">—</td></tr>
-              <tr><td>Збиток</td><td id="registeredDamage">—</td></tr>
-              <tr><td>Покриття</td><td id="registeredCoverage">—</td></tr>
-              <tr><td>Пояснення</td><td id="registeredClaimNote">—</td></tr>
-            </table>
-            <div class="actions">
-              <button class="btn ghost" onclick="goToDecision()">Перейти до розрахунку виплати</button>
-            </div>
-          </div>
+          <div class="section hidden" id="claimResultBox"><h3>Результат перевірки події</h3><table class="kv"><tr><td>Вид події</td><td id="registeredClaimType">—</td></tr><tr><td>Збиток</td><td id="registeredDamage">—</td></tr><tr><td>Строк дії поліса</td><td id="registeredPeriodCheck">—</td></tr><tr><td>Покриття</td><td id="registeredCoverage">—</td></tr><tr><td>Пояснення</td><td id="registeredClaimNote">—</td></tr></table><div class="actions"><button class="btn ghost" onclick="goToDecision()">Перейти до розрахунку виплати</button></div></div>
         </section>
 
-        <!-- SCREEN 3 -->
         <section class="screen" id="decisionScreen">
-          <div class="screen-head">
-            <div>
-              <h2>Рішення по виплаті</h2>
-              <div class="screen-desc">Тут система приймає рішення і показує не тільки цифри, а й логіку розрахунку.</div>
-            </div>
-            <div id="decisionStatus" class="status draft">Очікує розрахунку</div>
-          </div>
-
-          <div class="result-grid">
-            <div class="metric blue">
-              <div class="title">Базова виплата</div>
-              <div class="value" id="baseIndemnityValue">—</div>
-            </div>
-            <div class="metric orange">
-              <div class="title">Франшиза</div>
-              <div class="value" id="appliedFranchiseValue">—</div>
-            </div>
-            <div class="metric green">
-              <div class="title">Кінцева виплата</div>
-              <div class="value" id="finalIndemnityValue">—</div>
-            </div>
-          </div>
-
-          <div class="section color-decision">
-            <h3>Підсумкове рішення</h3>
-            <table class="kv">
-              <tr><td>Поліс</td><td id="decisionPolicyNumber">—</td></tr>
-              <tr><td>Ризик</td><td id="decisionRisk">—</td></tr>
-              <tr><td>Підсумок</td><td id="decisionSummary">—</td></tr>
-              <tr><td>Службове пояснення</td><td id="decisionNote">—</td></tr>
-            </table>
-            <div class="actions">
-              <button class="btn primary" onclick="calculateDecision()">Розрахувати виплату</button>
-              <button class="btn ghost" onclick="toggleExplanation()">Показати / сховати хід розрахунку</button>
-              <button class="btn secondary" onclick="resetAllWorkflow()">Новий поліс</button>
-            </div>
-            <div id="decisionWarning" class="warning-box"></div>
-          </div>
-
-          <div class="logic-steps hidden" id="decisionSteps">
-            <div class="step">
-              <div class="step-head">
-                <div class="step-num">1</div>
-                <div class="step-head-title">Перевірка покриття</div>
-              </div>
-              <div class="step-body">
-                <div class="logic-block">
-                  <div class="logic-label">Правило</div>
-                  <div class="note" id="logicRule1">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Висновок</div>
-                  <div class="note" id="logicExplain1">—</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-head">
-                <div class="step-num">2</div>
-                <div class="step-head-title">Визначення базової виплати</div>
-              </div>
-              <div class="step-body">
-                <div class="logic-block">
-                  <div class="logic-label">Правило</div>
-                  <div class="note" id="logicRule2">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Формула</div>
-                  <div class="formula-box" id="logicFormula2">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Підстановка</div>
-                  <div class="formula-box" id="logicSub2">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Пояснення</div>
-                  <div class="note" id="logicExplain2">—</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-head">
-                <div class="step-num">3</div>
-                <div class="step-head-title">Застосування франшизи</div>
-              </div>
-              <div class="step-body">
-                <div class="logic-block">
-                  <div class="logic-label">Правило</div>
-                  <div class="note" id="logicRule3">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Формула</div>
-                  <div class="formula-box" id="logicFormula3">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Підстановка</div>
-                  <div class="formula-box" id="logicSub3">—</div>
-                </div>
-                <div class="logic-block">
-                  <div class="logic-label">Пояснення</div>
-                  <div class="note" id="logicExplain3">—</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-head">
-                <div class="step-num">4</div>
-                <div class="step-head-title">Підсумкове рішення</div>
-              </div>
-              <div class="step-body">
-                <div class="logic-block">
-                  <div class="logic-label">Фінальний висновок</div>
-                  <div class="note" id="logicExplain4">—</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="screen-head"><div><h2>Рішення по виплаті</h2><div class="screen-desc">Система показує правило, формулу, підстановку і фінальне рішення.</div></div><div id="decisionStatus" class="status draft">Очікує розрахунку</div></div>
+          <div class="result-grid"><div class="metric blue"><div class="title">Базова виплата</div><div class="value" id="baseIndemnityValue">—</div></div><div class="metric orange"><div class="title">Франшиза</div><div class="value" id="appliedFranchiseValue">—</div></div><div class="metric green"><div class="title">Кінцева виплата</div><div class="value" id="finalIndemnityValue">—</div></div></div>
+          <div class="section decision"><h3>Підсумкове рішення</h3><table class="kv"><tr><td>Поліс</td><td id="decisionPolicyNumber">—</td></tr><tr><td>Ризик</td><td id="decisionRisk">—</td></tr><tr><td>Рішення</td><td id="decisionSummary">—</td></tr><tr><td>Службове пояснення</td><td id="decisionNote">—</td></tr></table><div class="actions"><button class="btn primary" onclick="calculateDecision()">Розрахувати виплату</button><button class="btn ghost" onclick="toggleExplanation()">Показати / сховати хід розрахунку</button><button class="btn secondary" onclick="resetAllWorkflow()">Новий поліс</button></div><div id="decisionWarning" class="warning-box"></div></div>
+          <div class="logic-steps hidden" id="decisionSteps"><div class="step"><div class="step-head"><div class="step-num">1</div><div class="step-title">Перевірка покриття</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Правило</div><div class="note" id="logicRule1">—</div></div><div class="logic-block"><div class="logic-label">Висновок</div><div class="note" id="logicExplain1">—</div></div></div></div><div class="step"><div class="step-head"><div class="step-num">2</div><div class="step-title">Визначення базової виплати</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Правило</div><div class="note" id="logicRule2">—</div></div><div class="logic-block"><div class="logic-label">Формула</div><div class="formula-box" id="logicFormula2">—</div></div><div class="logic-block"><div class="logic-label">Підстановка</div><div class="formula-box" id="logicSub2">—</div></div><div class="logic-block"><div class="logic-label">Пояснення</div><div class="note" id="logicExplain2">—</div></div></div></div><div class="step"><div class="step-head"><div class="step-num">3</div><div class="step-title">Застосування франшизи</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Правило</div><div class="note" id="logicRule3">—</div></div><div class="logic-block"><div class="logic-label">Формула</div><div class="formula-box" id="logicFormula3">—</div></div><div class="logic-block"><div class="logic-label">Підстановка</div><div class="formula-box" id="logicSub3">—</div></div><div class="logic-block"><div class="logic-label">Пояснення</div><div class="note" id="logicExplain3">—</div></div></div></div><div class="step"><div class="step-head"><div class="step-num">4</div><div class="step-title">Підсумкове рішення</div></div><div class="step-body"><div class="logic-block"><div class="logic-label">Фінальний висновок</div><div class="note" id="logicExplain4">—</div></div></div></div></div>
         </section>
       </main>
     </div>
@@ -887,656 +212,328 @@
 
   <script>
     const carCatalog = {
-      Renault: {
-        segment: 'Бюджетний',
-        models: {
-          Logan: 650000,
-          Sandero: 720000,
-          Duster: 950000
-        }
-      },
-      Toyota: {
-        segment: 'Середній',
-        models: {
-          Corolla: 1250000,
-          Camry: 1550000,
-          RAV4: 1850000
-        }
-      },
-      BMW: {
-        segment: 'Преміум',
-        models: {
-          '3 Series': 2050000,
-          '5 Series': 3000000,
-          X5: 4500000
-        }
-      }
+      Renault: { segment:'Бюджетний', models:{ Logan:650000, Sandero:720000, Duster:950000 } },
+      Toyota: { segment:'Середній', models:{ Corolla:1250000, Camry:1550000, RAV4:1850000 } },
+      BMW: { segment:'Преміум', models:{ '3 Series':2050000, '5 Series':3000000, X5:4500000 } }
     };
-
-    const riskTariffs = {
-      'ДТП': 3.0,
-      'Стихійне лихо': 0.3,
-      'Викрадення': 4.8
+    const riskTariffs = { 'ДТП':3.0, 'Стихійне лихо':0.3, 'Викрадення':4.8 };
+    const insuranceHistoryTable = {
+      'Новий клієнт': { coef:1.00, effect:'Базовий тариф без коригування.' },
+      '1 рік без збитків': { coef:0.95, effect:'Тариф зменшується на 5%.' },
+      '2 роки без збитків': { coef:0.90, effect:'Тариф зменшується на 10%.' },
+      '3+ роки без збитків': { coef:0.85, effect:'Тариф зменшується на 15%.' },
+      '1 ДТП у попередньому періоді': { coef:1.15, effect:'Тариф збільшується на 15%.' },
+      '2+ ДТП у попередньому періоді': { coef:1.30, effect:'Тариф збільшується на 30%.' }
     };
+    const state = { policy:null, claim:null, decision:null };
 
-    const state = {
-      policy: null,
-      claim: null,
-      decision: null
-    };
+    function money(v){ return new Intl.NumberFormat('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v); }
+    function showWarning(id,text){ const el=document.getElementById(id); el.style.display='block'; el.innerHTML=text; }
+    function hideWarning(id){ const el=document.getElementById(id); el.style.display='none'; el.innerHTML=''; }
+    function clearInvalids(){ document.querySelectorAll('.invalid').forEach(el=>el.classList.remove('invalid')); }
+    function markInvalid(...ids){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('invalid'); }); }
+    function todayISO(){ return new Date().toISOString().split('T')[0]; }
+    function todayStr(){ return new Date().toLocaleDateString('uk-UA'); }
+    function generatePolicyNumber(){ return `KSK-2026-${Math.floor(10000+Math.random()*90000)}`; }
+    function franchiseTypeLabel(type){ if(type==='conditional') return 'Умовна'; if(type==='unconditional') return 'Безумовна'; return 'Без франшизи'; }
+    function setWizard(screenId){ document.getElementById('wiz1').classList.toggle('active',screenId==='policyScreen'); document.getElementById('wiz2').classList.toggle('active',screenId==='claimScreen'); document.getElementById('wiz3').classList.toggle('active',screenId==='decisionScreen'); }
+    function switchScreen(screenId){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(screenId).classList.add('active'); document.querySelector(`.nav-btn[data-screen="${screenId}"]`).classList.add('active'); setWizard(screenId); }
+    document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchScreen(btn.dataset.screen)));
 
-    function money(v) {
-      return new Intl.NumberFormat('uk-UA', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(v);
+
+    function parseMoneyInput(value){
+      if (typeof value !== 'string') return NaN;
+      const cleaned = value.replace(/\s+/g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+      return cleaned ? parseFloat(cleaned) : NaN;
     }
 
-    function percent(v) {
-      return new Intl.NumberFormat('uk-UA', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(v);
+    function formatIntegerLike(value){
+      if (value === null || value === undefined) return '';
+      const digits = String(value).replace(/\D/g, '');
+      if (!digits) return '';
+      return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Number(digits));
     }
 
-    function percentText(v) {
-      return percent(v) + '%';
-    }
-
-    function showWarning(id, text) {
+    function attachMoneyFormatting(id){
       const el = document.getElementById(id);
-      el.style.display = 'block';
-      el.innerHTML = text;
-    }
-
-    function hideWarning(id) {
-      const el = document.getElementById(id);
-      el.style.display = 'none';
-      el.innerHTML = '';
-    }
-
-    function clearInvalids() {
-      document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
-    }
-
-    function markInvalid(...ids) {
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('invalid');
-      });
-    }
-
-    function todayStr() {
-      return new Date().toLocaleDateString('uk-UA');
-    }
-
-    function generatePolicyNumber() {
-      const n = Math.floor(10000 + Math.random() * 90000);
-      return `KSK-2026-${n}`;
-    }
-
-    function franchiseTypeLabel(type) {
-      if (type === 'conditional') return 'Умовна';
-      if (type === 'unconditional') return 'Безумовна';
-      return 'Без франшизи';
-    }
-
-    function switchScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-      document.querySelector(`.nav-btn[data-screen="${screenId}"]`).classList.add('active');
-    }
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchScreen(btn.dataset.screen));
-    });
-
-    function getAgeBand(year) {
-      const currentYear = 2026;
-      const age = currentYear - year;
-      if (age <= 3) return { age, valueCoef: 1.00, tariffCoef: 1.00, label: 'до 3 років' };
-      if (age <= 7) return { age, valueCoef: 0.85, tariffCoef: 1.05, label: '4–7 років' };
-      if (age <= 12) return { age, valueCoef: 0.70, tariffCoef: 1.10, label: '8–12 років' };
-      return { age, valueCoef: 0.55, tariffCoef: 1.20, label: 'понад 12 років' };
-    }
-
-    function initCarSelectors() {
-      const brandEl = document.getElementById('carBrand');
-      brandEl.innerHTML = Object.keys(carCatalog)
-        .map(brand => `<option value="${brand}">${brand}</option>`)
-        .join('');
-      updateModelOptions();
-    }
-
-    function updateModelOptions() {
-      const brand = document.getElementById('carBrand').value;
-      const modelEl = document.getElementById('carModel');
-      modelEl.innerHTML = Object.keys(carCatalog[brand].models)
-        .map(model => `<option value="${model}">${model}</option>`)
-        .join('');
-      updateCarDerivedFields();
-    }
-
-    function updateCarDerivedFields() {
-      const brand = document.getElementById('carBrand').value;
-      const model = document.getElementById('carModel').value;
-      const year = parseInt(document.getElementById('carYear').value || '2022', 10);
-      const basePrice = carCatalog[brand].models[model];
-      const band = getAgeBand(year);
-      const marketValue = Math.round(basePrice * band.valueCoef);
-
-      document.getElementById('carSegment').value = carCatalog[brand].segment;
-      document.getElementById('marketValue').value = marketValue;
-
-      if (!document.getElementById('insuredSum').value) {
-        document.getElementById('insuredSum').value = marketValue;
-      }
-
-      updatePolicyPreview();
-    }
-
-    function getSelectedRisks() {
-      const risks = [];
-      if (document.getElementById('riskDtp').checked) risks.push('ДТП');
-      if (document.getElementById('riskNature').checked) risks.push('Стихійне лихо');
-      if (document.getElementById('riskTheft').checked) risks.push('Викрадення');
-      return risks;
-    }
-
-    function calculatePolicyValues() {
-      const brand = document.getElementById('carBrand').value;
-      const model = document.getElementById('carModel').value;
-      const year = parseInt(document.getElementById('carYear').value, 10);
-      const segment = document.getElementById('carSegment').value;
-      const clientName = document.getElementById('clientName').value.trim();
-      const clientType = document.getElementById('clientType').value;
-      const marketValue = parseFloat(document.getElementById('marketValue').value);
-      const insuredSum = parseFloat(document.getElementById('insuredSum').value);
-      const risks = getSelectedRisks();
-      const franchiseType = document.getElementById('franchiseType').value;
-      const franchiseValue = parseFloat(document.getElementById('franchiseValue').value) || 0;
-      const discount = parseFloat(document.getElementById('discount').value) || 0;
-      const bonusMalus = parseFloat(document.getElementById('bonusMalus').value) || 1;
-
-      const ageBand = getAgeBand(year);
-      const baseTariff = risks.reduce((sum, risk) => sum + riskTariffs[risk], 0);
-      const totalTariff = baseTariff * ageBand.tariffCoef * (1 - discount / 100) * bonusMalus;
-      const premium = insuredSum * (totalTariff / 100);
-
-      return {
-        brand, model, year, segment, clientName, clientType,
-        marketValue, insuredSum, risks, franchiseType, franchiseValue,
-        discount, bonusMalus, ageBand, baseTariff, totalTariff, premium
+      const formatNow = () => {
+        el.value = formatIntegerLike(el.value);
       };
+      el.addEventListener('input', formatNow);
+      el.addEventListener('blur', formatNow);
     }
 
-    function updatePolicyPreview() {
-      try {
+    function getAgeBand(year){
+      const age = 2026-year;
+      if(age<=3) return {age, valueCoef:1.00, tariffCoef:1.00, label:'до 3 років'};
+      if(age<=7) return {age, valueCoef:0.85, tariffCoef:1.05, label:'4–7 років'};
+      if(age<=12) return {age, valueCoef:0.70, tariffCoef:1.10, label:'8–12 років'};
+      return {age, valueCoef:0.55, tariffCoef:1.20, label:'понад 12 років'};
+    }
+    function addMonths(isoDate, months){ if(!isoDate) return ''; const d = new Date(isoDate + 'T00:00:00'); d.setMonth(d.getMonth()+Number(months)); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; }
+    function formatDateUA(iso){ if(!iso) return '—'; return new Date(iso+'T00:00:00').toLocaleDateString('uk-UA'); }
+    function initHistorySelect(){ const el = document.getElementById('insuranceHistory'); el.innerHTML = Object.keys(insuranceHistoryTable).map(name=>`<option value="${name}">${name}</option>`).join(''); }
+    function initCarSelectors(){ const brandEl = document.getElementById('carBrand'); brandEl.innerHTML = Object.keys(carCatalog).map(brand=>`<option value="${brand}">${brand}</option>`).join(''); updateModelOptions(); }
+    function updateModelOptions(){ const brand = document.getElementById('carBrand').value; const modelEl = document.getElementById('carModel'); modelEl.innerHTML = Object.keys(carCatalog[brand].models).map(model=>`<option value="${model}">${model}</option>`).join(''); updateCarDerivedFields(); }
+    function updateCarDerivedFields(){ const brand = document.getElementById('carBrand').value; const model = document.getElementById('carModel').value; const year = parseInt(document.getElementById('carYear').value || '2022',10); const basePrice = carCatalog[brand].models[model]; const band = getAgeBand(year); const marketValue = Math.round(basePrice * band.valueCoef); document.getElementById('carSegment').value = carCatalog[brand].segment; document.getElementById('marketValue').value = marketValue; if(!document.getElementById('insuredSum').value){ document.getElementById('insuredSum').value = marketValue; } updatePolicyPreview(); }
+    function updatePolicyDates(){ const start = document.getElementById('policyStart').value; const term = document.getElementById('policyTerm').value; document.getElementById('policyEnd').value = addMonths(start,term); updatePolicyPreview(); }
+    function getSelectedRisks(){ const risks = []; if(document.getElementById('riskDtp').checked) risks.push('ДТП'); if(document.getElementById('riskNature').checked) risks.push('Стихійне лихо'); if(document.getElementById('riskTheft').checked) risks.push('Викрадення'); return risks; }
+    function getCityCoef(city){ return ['Київ','Харків','Одеса','Дніпро'].includes(city) ? 1.05 : 1.00; }
+    function getDriverAgeCoef(age){ if(age<25) return 1.15; if(age<=60) return 1.00; return 1.08; }
+    function getTaxiCoef(isTaxi){ return isTaxi ? 1.25 : 1.00; }
+    function getCreditCoef(isCredit){ return isCredit ? 1.03 : 1.00; }
+    function coefClass(value){ if(value < 1) return 'good'; if(value > 1) return 'bad'; return 'neutral'; }
+
+    function calculatePolicyValues(){
+      const brand=document.getElementById('carBrand').value;
+      const model=document.getElementById('carModel').value;
+      const year=parseInt(document.getElementById('carYear').value,10);
+      const segment=document.getElementById('carSegment').value;
+      const clientName=document.getElementById('clientName').value.trim();
+      const clientType=document.getElementById('clientType').value;
+      const driverAge=parseInt(document.getElementById('driverAge').value,10);
+      const plateNumber=document.getElementById('plateNumber').value.trim().toUpperCase();
+      const cityReg=document.getElementById('cityReg').value;
+      const marketValue=parseMoneyInput(document.getElementById('marketValue').value);
+      const insuredSum=parseMoneyInput(document.getElementById('insuredSum').value);
+      const isCredit=document.getElementById('isCredit').checked;
+      const isTaxi=document.getElementById('isTaxi').checked;
+      const policyStart=document.getElementById('policyStart').value;
+      const policyTerm=parseInt(document.getElementById('policyTerm').value,10);
+      const policyEnd=document.getElementById('policyEnd').value;
+      const risks=getSelectedRisks();
+      const franchiseType=document.getElementById('franchiseType').value;
+      const franchiseValue=parseMoneyInput(document.getElementById('franchiseValue').value)||0;
+      const discount=parseFloat(document.getElementById('discount').value)||0;
+      const history=document.getElementById('insuranceHistory').value;
+      const historyCoef=insuranceHistoryTable[history].coef;
+      const ageBand=getAgeBand(year);
+      const baseTariff=risks.reduce((sum,risk)=>sum+riskTariffs[risk],0);
+      const cityCoef=getCityCoef(cityReg);
+      const driverAgeCoef=getDriverAgeCoef(driverAge);
+      const taxiCoef=getTaxiCoef(isTaxi);
+      const creditCoef=getCreditCoef(isCredit);
+      const totalTariff = baseTariff * ageBand.tariffCoef * cityCoef * driverAgeCoef * taxiCoef * creditCoef * historyCoef * (1 - discount/100);
+      const premium = insuredSum * (totalTariff/100);
+      return { brand,model,year,segment,clientName,clientType,driverAge,plateNumber,cityReg,marketValue,insuredSum,isCredit,isTaxi,policyStart,policyTerm,policyEnd,risks,franchiseType,franchiseValue,discount,history,historyCoef,ageBand,baseTariff,cityCoef,driverAgeCoef,taxiCoef,creditCoef,totalTariff,premium };
+    }
+
+    function updateHints(d){
+      document.getElementById('hintDriverAge').innerHTML = `Коефіцієнт: <span class="${coefClass(d.driverAgeCoef)}">${d.driverAgeCoef}</span>`;
+      document.getElementById('hintCarYear').innerHTML = `Вікова група авто: ${d.ageBand.label}; коефіцієнт: <span class="${coefClass(d.ageBand.tariffCoef)}">${d.ageBand.tariffCoef}</span>`;
+      document.getElementById('hintCity').innerHTML = `Коефіцієнт міста: <span class="${coefClass(d.cityCoef)}">${d.cityCoef}</span>`;
+      document.getElementById('hintCredit').innerHTML = `Коефіцієнт кредиту: <span class="${coefClass(d.creditCoef)}">${d.creditCoef}</span>`;
+      document.getElementById('hintTaxi').innerHTML = `Коефіцієнт таксі: <span class="${coefClass(d.taxiCoef)}">${d.taxiCoef}</span>`;
+      document.getElementById('hintHistory').innerHTML = `Коефіцієнт історії: <span class="${coefClass(d.historyCoef)}">${d.historyCoef}</span> — ${insuranceHistoryTable[d.history].effect}`;
+      document.getElementById('hintDiscount').innerHTML = `Знижка: <span class="good">${d.discount}%</span>`;
+      document.getElementById('hintRisks').innerHTML = d.risks.length ? `Базовий тариф за ризиками: <span class="neutral">${money(d.baseTariff)}%</span>` : 'Базовий тариф за ризиками: —';
+    }
+
+    function updateTariffExplanation(){
+      try{
+        const d = calculatePolicyValues();
+        document.getElementById('tariffBaseValue').textContent = isFinite(d.baseTariff) ? money(d.baseTariff) + '%' : '—';
+        document.getElementById('tariffFinalValue').textContent = isFinite(d.totalTariff) ? money(d.totalTariff) + '%' : '—';
+        document.getElementById('tariffPremiumValue').textContent = isFinite(d.premium) ? money(d.premium) + ' грн' : '—';
+        document.getElementById('tariffStep1').textContent = d.risks.length ? `${d.risks.map(r => `${r} = ${money(riskTariffs[r])}%`).join(' + ')}\nБазовий тариф = ${money(d.baseTariff)}%` : 'Оберіть хоча б один ризик.';
+        document.getElementById('coefAgeAuto').textContent = `${d.ageBand.tariffCoef} (${d.ageBand.label})`;
+        document.getElementById('coefCity').textContent = `${d.cityCoef} (${d.cityReg})`;
+        document.getElementById('coefDriverAge').textContent = `${d.driverAgeCoef} (вік ${d.driverAge} років)`;
+        document.getElementById('coefTaxi').textContent = `${d.taxiCoef} (${d.isTaxi ? 'авто використовується в таксі' : 'авто не використовується в таксі'})`;
+        document.getElementById('coefCredit').textContent = `${d.creditCoef} (${d.isCredit ? 'авто в кредиті' : 'авто не в кредиті'})`;
+        document.getElementById('coefHistory').textContent = `${d.historyCoef} (${d.history})`;
+        document.getElementById('coefDiscount').textContent = `${d.discount}%`;
+        document.getElementById('tariffStep3').textContent = `${money(d.baseTariff)} × ${d.ageBand.tariffCoef} × ${d.cityCoef} × ${d.driverAgeCoef} × ${d.taxiCoef} × ${d.creditCoef} × ${d.historyCoef} × (1 - ${d.discount}/100)\n= ${money(d.totalTariff)}%`;
+        document.getElementById('tariffStep4').textContent = `${money(d.insuredSum)} × ${money(d.totalTariff)} / 100 = ${money(d.premium)} грн`;
+      }catch(e){}
+    }
+
+    function updatePolicyPreview(){
+      try{
         const d = calculatePolicyValues();
         document.getElementById('policyNumberView').textContent = state.policy ? state.policy.policyNumber : '—';
         document.getElementById('policyDateView').textContent = state.policy ? state.policy.policyDate : '—';
+        document.getElementById('policyPeriodView').textContent = d.policyStart ? `${formatDateUA(d.policyStart)} — ${formatDateUA(d.policyEnd)}` : '—';
         document.getElementById('clientView').textContent = d.clientName || '—';
         document.getElementById('clientTypeView').textContent = d.clientType || '—';
         document.getElementById('carView').textContent = `${d.brand} ${d.model}, ${d.year}`;
+        document.getElementById('plateView').textContent = d.plateNumber || '—';
+        document.getElementById('cityView').textContent = d.cityReg || '—';
         document.getElementById('segmentView').textContent = d.segment;
-        document.getElementById('marketValueView').textContent = isFinite(d.marketValue) ? money(d.marketValue) + ' грн' : '—';
-        document.getElementById('insuredSumView').textContent = isFinite(d.insuredSum) ? money(d.insuredSum) + ' грн' : '—';
+        document.getElementById('marketValueView').textContent = isFinite(d.marketValue) ? money(d.marketValue)+' грн' : '—';
+        document.getElementById('insuredSumView').textContent = isFinite(d.insuredSum) ? money(d.insuredSum)+' грн' : '—';
         document.getElementById('risksView').textContent = d.risks.length ? d.risks.join(', ') : '—';
         document.getElementById('franchiseView').textContent = `${franchiseTypeLabel(d.franchiseType)}, ${money(d.franchiseValue)} грн`;
-        document.getElementById('discountView').textContent = `${d.discount}% / ${d.bonusMalus}`;
-        document.getElementById('ageCoefView').textContent = `${d.ageBand.label}; коеф. вартості ${d.ageBand.valueCoef}, коеф. тарифу ${d.ageBand.tariffCoef}`;
-        document.getElementById('tariffView').textContent = isFinite(d.totalTariff) ? percentText(d.totalTariff) : '—';
-        document.getElementById('premiumView').textContent = isFinite(d.premium) ? money(d.premium) + ' грн' : '—';
-      } catch (e) {}
+        document.getElementById('historyView').textContent = `${d.history} → коеф. ${d.historyCoef}`;
+        document.getElementById('coefView').textContent = `Вік авто ${d.ageBand.tariffCoef}; місто ${d.cityCoef}; вік водія ${d.driverAgeCoef}; таксі ${d.taxiCoef}; кредит ${d.creditCoef}`;
+        document.getElementById('tariffView').textContent = isFinite(d.totalTariff) ? money(d.totalTariff)+'%' : '—';
+        document.getElementById('premiumView').textContent = isFinite(d.premium) ? money(d.premium)+' грн' : '—';
+        document.getElementById('premiumSticky').textContent = isFinite(d.premium) ? money(d.premium)+' грн' : '—';
+        updateHints(d);
+        updateTariffExplanation();
+      }catch(e){}
     }
 
-    function validatePolicy(data) {
-      clearInvalids();
-      hideWarning('policyWarning');
-
-      if (!data.clientName) {
-        markInvalid('clientName');
-        showWarning('policyWarning', 'Вкажіть ПІБ страхувальника.');
-        return false;
-      }
-
-      if (!Number.isInteger(data.year) || data.year < 2000 || data.year > 2026) {
-        markInvalid('carYear');
-        showWarning('policyWarning', 'Рік випуску має бути в межах від 2000 до 2026.');
-        return false;
-      }
-
-      if (!isFinite(data.marketValue) || data.marketValue <= 0) {
-        markInvalid('marketValue');
-        showWarning('policyWarning', 'Ринкова вартість авто має бути більшою за нуль.');
-        return false;
-      }
-
-      if (!isFinite(data.insuredSum) || data.insuredSum <= 0) {
-        markInvalid('insuredSum');
-        showWarning('policyWarning', 'Страхова сума має бути більшою за нуль.');
-        return false;
-      }
-
-      if (data.insuredSum > data.marketValue) {
-        markInvalid('insuredSum', 'marketValue');
-        showWarning('policyWarning', 'Страхова сума не може перевищувати ринкову вартість авто.');
-        return false;
-      }
-
-      if (!data.risks.length) {
-        showWarning('policyWarning', 'Оберіть хоча б один страховий ризик.');
-        return false;
-      }
-
-      if (data.franchiseValue < 0) {
-        markInvalid('franchiseValue');
-        showWarning('policyWarning', 'Франшиза не може бути від’ємною.');
-        return false;
-      }
-
-      if (data.franchiseValue > data.insuredSum) {
-        markInvalid('franchiseValue', 'insuredSum');
-        showWarning('policyWarning', 'Франшиза не може перевищувати страхову суму.');
-        return false;
-      }
-
-      if (data.discount < 0 || data.discount > 30) {
-        markInvalid('discount');
-        showWarning('policyWarning', 'Знижка має бути в межах від 0% до 30%.');
-        return false;
-      }
-
-      if (data.bonusMalus < 0.5 || data.bonusMalus > 2.0) {
-        markInvalid('bonusMalus');
-        showWarning('policyWarning', 'Бонус-малус має бути в межах від 0.5 до 2.0.');
-        return false;
-      }
-
+    function validatePolicy(data){
+      clearInvalids(); hideWarning('policyWarning');
+      if(!data.clientName){ markInvalid('clientName'); showWarning('policyWarning','Вкажіть ПІБ страхувальника.'); return false; }
+      if(!Number.isInteger(data.driverAge) || data.driverAge<18 || data.driverAge>90){ markInvalid('driverAge'); showWarning('policyWarning','Вік страхувальника має бути в межах від 18 до 90 років.'); return false; }
+      if(!Number.isInteger(data.year) || data.year<2000 || data.year>2026){ markInvalid('carYear'); showWarning('policyWarning','Рік випуску має бути в межах від 2000 до 2026.'); return false; }
+      if(!data.plateNumber || data.plateNumber.length<6){ markInvalid('plateNumber'); showWarning('policyWarning','Вкажіть коректний держномер автомобіля.'); return false; }
+      if(!data.policyStart){ markInvalid('policyStart'); showWarning('policyWarning','Вкажіть дату початку дії поліса.'); return false; }
+      if(!data.policyEnd){ markInvalid('policyStart','policyTerm'); showWarning('policyWarning','Не вдалося визначити дату закінчення поліса.'); return false; }
+      if(!isFinite(data.marketValue) || data.marketValue<=0){ markInvalid('marketValue'); showWarning('policyWarning','Ринкова вартість авто має бути більшою за нуль.'); return false; }
+      if(!isFinite(data.insuredSum) || data.insuredSum<=0){ markInvalid('insuredSum'); showWarning('policyWarning','Страхова сума має бути більшою за нуль.'); return false; }
+      if(data.insuredSum > data.marketValue){ markInvalid('insuredSum','marketValue'); showWarning('policyWarning','Страхова сума не може перевищувати ринкову вартість авто.'); return false; }
+      if(!data.risks.length){ showWarning('policyWarning','Оберіть хоча б один страховий ризик.'); return false; }
+      if(data.franchiseValue < 0){ markInvalid('franchiseValue'); showWarning('policyWarning','Франшиза не може бути від’ємною.'); return false; }
+      if(data.franchiseValue > data.insuredSum){ markInvalid('franchiseValue','insuredSum'); showWarning('policyWarning','Франшиза не може перевищувати страхову суму.'); return false; }
+      if(data.discount < 0 || data.discount > 30){ markInvalid('discount'); showWarning('policyWarning','Знижка має бути в межах від 0% до 30%.'); return false; }
       return true;
     }
 
-    function createPolicy() {
+    function createPolicy(){
       const data = calculatePolicyValues();
-      if (!validatePolicy(data)) return;
-
-      state.policy = {
-        ...data,
-        policyNumber: generatePolicyNumber(),
-        policyDate: todayStr(),
-        status: 'Активний'
-      };
-
-      document.getElementById('policyStatus').className = 'status active';
-      document.getElementById('policyStatus').textContent = 'Поліс активний';
-      document.getElementById('policyPreviewStatus').className = 'status active';
-      document.getElementById('policyPreviewStatus').textContent = 'Поліс активний';
+      if(!validatePolicy(data)) return;
+      state.policy = { ...data, policyNumber:generatePolicyNumber(), policyDate:todayStr(), status:'Активний' };
+      document.getElementById('policyStatus').className='status active';
+      document.getElementById('policyStatus').textContent='Поліс активний';
+      document.getElementById('policyPreviewStatus').className='status active';
+      document.getElementById('policyPreviewStatus').textContent='Поліс активний';
       updatePolicyPreview();
       fillClaimPolicyData();
       switchScreen('claimScreen');
     }
 
-    function fillClaimPolicyData() {
-      if (!state.policy) return;
+    function fillClaimPolicyData(){
+      if(!state.policy) return;
       document.getElementById('claimPolicyNumber').textContent = state.policy.policyNumber;
-      document.getElementById('claimCarView').textContent = `${state.policy.brand} ${state.policy.model}, ${state.policy.year}`;
+      document.getElementById('claimCarView').textContent = `${state.policy.brand} ${state.policy.model}, ${state.policy.year}, ${state.policy.plateNumber}`;
+      document.getElementById('claimPeriodView').textContent = `${formatDateUA(state.policy.policyStart)} — ${formatDateUA(state.policy.policyEnd)}`;
       document.getElementById('claimRisksView').textContent = state.policy.risks.join(', ');
       document.getElementById('claimFranchiseView').textContent = `${franchiseTypeLabel(state.policy.franchiseType)}, ${money(state.policy.franchiseValue)} грн`;
     }
 
-    function validateClaim() {
-      clearInvalids();
-      hideWarning('claimWarning');
-
-      if (!state.policy) {
-        showWarning('claimWarning', 'Спочатку сформуйте поліс.');
-        return false;
-      }
-
-      const claimDate = document.getElementById('claimDate').value;
-      const damageAmount = parseFloat(document.getElementById('damageAmount').value);
-
-      if (!claimDate) {
-        markInvalid('claimDate');
-        showWarning('claimWarning', 'Вкажіть дату події.');
-        return false;
-      }
-
-      if (!isFinite(damageAmount) || damageAmount <= 0) {
-        markInvalid('damageAmount');
-        showWarning('claimWarning', 'Сума збитку має бути більшою за нуль.');
-        return false;
-      }
-
-      if (damageAmount > state.policy.marketValue) {
-        markInvalid('damageAmount');
-        showWarning('claimWarning', 'Сума збитку не може перевищувати ринкову вартість авто.');
-        return false;
-      }
-
+    function validateClaim(){
+      clearInvalids(); hideWarning('claimWarning');
+      if(!state.policy){ showWarning('claimWarning','Спочатку сформуйте поліс.'); return false; }
+      const claimDate=document.getElementById('claimDate').value;
+      const damageAmount=parseMoneyInput(document.getElementById('damageAmount').value);
+      if(!claimDate){ markInvalid('claimDate'); showWarning('claimWarning','Вкажіть дату події.'); return false; }
+      if(!isFinite(damageAmount) || damageAmount<=0){ markInvalid('damageAmount'); showWarning('claimWarning','Сума збитку має бути більшою за нуль.'); return false; }
+      if(damageAmount > state.policy.marketValue){ markInvalid('damageAmount'); showWarning('claimWarning','Сума збитку не може перевищувати ринкову вартість авто.'); return false; }
       return true;
     }
 
-    function registerClaim() {
-      if (!validateClaim()) return;
-
-      const claimDate = document.getElementById('claimDate').value;
-      const claimType = document.getElementById('claimType').value;
-      const damageAmount = parseFloat(document.getElementById('damageAmount').value);
-      const claimDescription = document.getElementById('claimDescription').value.trim();
-
-      const covered = state.policy.risks.includes(claimType);
-      const note = covered
-        ? 'Подія входить до переліку ризиків, передбачених полісом.'
-        : 'Подія не входить до переліку ризиків, зазначених у полісі.';
-
-      state.claim = {
-        claimDate,
-        claimType,
-        damageAmount,
-        claimDescription,
-        covered,
-        note
-      };
-
+    function registerClaim(){
+      if(!validateClaim()) return;
+      const claimDate=document.getElementById('claimDate').value;
+      const claimType=document.getElementById('claimType').value;
+      const damageAmount=parseMoneyInput(document.getElementById('damageAmount').value);
+      const claimDescription=document.getElementById('claimDescription').value.trim();
+      const inPeriod = claimDate >= state.policy.policyStart && claimDate <= state.policy.policyEnd;
+      const coveredByRisk = state.policy.risks.includes(claimType);
+      const covered = inPeriod && coveredByRisk;
+      let note='';
+      if(!inPeriod) note='Дата події виходить за межі строку дії поліса.';
+      else if(!coveredByRisk) note='Подія не входить до переліку ризиків, зазначених у полісі.';
+      else note='Подія входить до покриття полісу і може бути розглянута для виплати.';
+      state.claim = { claimDate, claimType, damageAmount, claimDescription, inPeriod, coveredByRisk, covered, note };
       document.getElementById('registeredClaimType').textContent = claimType;
-      document.getElementById('registeredDamage').textContent = money(damageAmount) + ' грн';
+      document.getElementById('registeredDamage').textContent = money(damageAmount)+' грн';
+      document.getElementById('registeredPeriodCheck').textContent = inPeriod ? 'Подія в межах строку дії поліса' : 'Подія поза строком дії поліса';
       document.getElementById('registeredCoverage').textContent = covered ? 'Ризик покрито' : 'Ризик не покрито';
       document.getElementById('registeredClaimNote').textContent = note;
-      document.getElementById('claimResultBox').classList.remove('hidden');
-
-      const badge = document.getElementById('claimStateBadge');
+      const badge=document.getElementById('claimStateBadge');
       badge.className = covered ? 'status active' : 'status denied';
-      badge.textContent = covered ? 'Подію прийнято' : 'Ризик не покрито';
+      badge.textContent = covered ? 'Подію прийнято' : 'Подію відхилено';
+      document.getElementById('claimResultBox').classList.remove('hidden');
     }
 
-    function goToDecision() {
-      switchScreen('decisionScreen');
-      fillDecisionHeader();
-    }
+    function goToDecision(){ switchScreen('decisionScreen'); fillDecisionHeader(); }
+    function fillDecisionHeader(){ document.getElementById('decisionPolicyNumber').textContent = state.policy ? state.policy.policyNumber : '—'; document.getElementById('decisionRisk').textContent = state.claim ? state.claim.claimType : '—'; }
 
-    function fillDecisionHeader() {
-      document.getElementById('decisionPolicyNumber').textContent = state.policy ? state.policy.policyNumber : '—';
-      document.getElementById('decisionRisk').textContent = state.claim ? state.claim.claimType : '—';
-    }
-
-    function applyFranchise(baseValue, loss, type, franchise) {
-      if (type === 'none' || franchise === 0) {
-        return {
-          finalValue: baseValue,
-          applied: 0,
-          rule: 'Франшиза не застосовується.',
-          formula: 'Кінцева виплата = Базова виплата',
-          substitution: `${money(baseValue)} = ${money(baseValue)} грн`,
-          explanation: 'Оскільки франшиза відсутня, базова виплата не зменшується.'
-        };
+    function applyFranchise(baseValue, loss, type, franchise){
+      if(type==='none' || franchise===0){ return { finalValue:baseValue, applied:0, rule:'Франшиза відсутня, тому базова виплата не змінюється.', formula:'Кінцева виплата = Базова виплата', substitution:`${money(baseValue)} = ${money(baseValue)} грн`, explanation:'Оскільки франшиза не передбачена, вся базова виплата переходить у фінальну.' }; }
+      if(type==='conditional'){
+        if(loss <= franchise){ return { finalValue:0, applied:0, rule:'За умовної франшизи, якщо збиток не перевищує франшизу, виплата не здійснюється.', formula:'Якщо збиток ≤ франшиза → виплата = 0', substitution:`${money(loss)} ≤ ${money(franchise)} → виплата = 0 грн`, explanation:'Збиток не перевищує умовну франшизу, тому страховик не проводить виплату.' }; }
+        return { finalValue:baseValue, applied:0, rule:'За умовної франшизи, якщо збиток перевищує франшизу, франшиза не віднімається.', formula:'Якщо збиток > франшиза → виплата = базова виплата', substitution:`${money(loss)} > ${money(franchise)} → виплата = ${money(baseValue)} грн`, explanation:'Збиток перевищує умовну франшизу, тому до виплати береться повна базова сума.' };
       }
-
-      if (type === 'conditional') {
-        if (loss <= franchise) {
-          return {
-            finalValue: 0,
-            applied: 0,
-            rule: 'За умовної франшизи, якщо збиток не перевищує франшизу, виплата не здійснюється.',
-            formula: 'Якщо збиток ≤ франшиза → виплата = 0',
-            substitution: `${money(loss)} ≤ ${money(franchise)} → виплата = 0 грн`,
-            explanation: 'Збиток не перевищує умовну франшизу, тому страховик не проводить виплату.'
-          };
-        }
-        return {
-          finalValue: baseValue,
-          applied: 0,
-          rule: 'За умовної франшизи, якщо збиток перевищує франшизу, франшиза не віднімається.',
-          formula: 'Якщо збиток > франшиза → виплата = базова виплата',
-          substitution: `${money(loss)} > ${money(franchise)} → виплата = ${money(baseValue)} грн`,
-          explanation: 'Збиток перевищує умовну франшизу, тому до виплати береться повна базова сума.'
-        };
-      }
-
-      if (type === 'unconditional') {
-        const finalValue = Math.max(baseValue - franchise, 0);
-        return {
-          finalValue,
-          applied: franchise,
-          rule: 'За безумовної франшизи її сума завжди віднімається від базової виплати.',
-          formula: 'Кінцева виплата = Базова виплата − Франшиза',
-          substitution: `${money(baseValue)} − ${money(franchise)} = ${money(finalValue)} грн`,
-          explanation: 'Безумовна франшиза зменшує суму страхової виплати незалежно від розміру збитку.'
-        };
-      }
-
-      return {
-        finalValue: baseValue,
-        applied: 0,
-        rule: 'Франшиза не застосовується.',
-        formula: 'Кінцева виплата = Базова виплата',
-        substitution: `${money(baseValue)} = ${money(baseValue)} грн`,
-        explanation: 'Базова виплата не змінюється.'
-      };
+      const finalValue=Math.max(baseValue-franchise,0);
+      return { finalValue, applied:franchise, rule:'За безумовної франшизи її сума завжди віднімається від базової виплати.', formula:'Кінцева виплата = Базова виплата − Франшиза', substitution:`${money(baseValue)} − ${money(franchise)} = ${money(finalValue)} грн`, explanation:'Безумовна франшиза зменшує страхову виплату незалежно від розміру збитку.' };
     }
 
-    function calculateDecision() {
-      clearInvalids();
+    function calculateDecision(){
       hideWarning('decisionWarning');
-
-      if (!state.policy) {
-        showWarning('decisionWarning', 'Спочатку сформуйте поліс.');
-        return;
-      }
-      if (!state.claim) {
-        showWarning('decisionWarning', 'Спочатку зареєструйте страховий випадок.');
-        return;
-      }
-
-      let baseIndemnity = 0;
-      let finalIndemnity = 0;
-      let appliedFranchise = 0;
-      let note = '';
-      let statusText = '';
-      let statusClass = 'draft';
-
-      // Step 1
-      let rule1 = '';
-      let explain1 = '';
-
-      // Step 2
-      let rule2 = 'Базова виплата за КАСКО визначається в межах страхової суми.';
-      let formula2 = 'Базова виплата = min(збиток; страхова сума)';
-      let sub2 = '';
-      let explain2 = '';
-
-      // Step 3
-      let rule3 = '';
-      let formula3 = '';
-      let sub3 = '';
-      let explain3 = '';
-
-      // Step 4
-      let explain4 = '';
-
-      if (!state.claim.covered) {
-        rule1 = 'Подія повинна входити до переліку ризиків, передбачених у полісі.';
-        explain1 = 'Обраний тип події не входить до страхового покриття, тому справа завершується відмовою.';
-        note = 'Подія не входить до покриття полісу, тому виплата не проводиться.';
-        statusText = 'Відмова';
-        statusClass = 'denied';
-
-        formula2 = 'Базова виплата не визначається';
-        sub2 = 'Оскільки ризик не покрито → базова виплата = 0 грн';
-        explain2 = 'Розрахунок не продовжується, бо страховий випадок не підтверджено в межах покриття.';
-
-        rule3 = 'Франшиза не аналізується, якщо подія не покривається.';
-        formula3 = 'Кінцева виплата = 0';
-        sub3 = 'Ризик не покрито → виплата = 0 грн';
-        explain3 = 'Франшиза не має значення, оскільки сама подія не є покритим ризиком.';
-
-        explain4 = 'Прийнято рішення про відмову у виплаті, оскільки подія не входить до покриття полісу.';
+      if(!state.policy){ showWarning('decisionWarning','Спочатку сформуйте поліс.'); return; }
+      if(!state.claim){ showWarning('decisionWarning','Спочатку зареєструйте страховий випадок.'); return; }
+      let baseIndemnity=0, finalIndemnity=0, appliedFranchise=0, note='', statusText='', statusClass='draft';
+      let rule1='', explain1='', rule2='Базова виплата за КАСКО визначається в межах страхової суми.', formula2='Базова виплата = min(збиток; страхова сума)', sub2='', explain2='', rule3='', formula3='', sub3='', explain3='', explain4='';
+      if(!state.claim.inPeriod){
+        rule1='Страховий випадок може розглядатися лише в межах строку дії поліса.'; explain1='Дата події виходить за межі строку дії поліса, тому виплата неможлива.'; note='Відмова у виплаті: поліс на дату події не діяв.'; statusText='Відмова'; statusClass='denied';
+        formula2='Базова виплата не визначається'; sub2='Поліс не діє на дату події → базова виплата = 0 грн'; explain2='Подальший розрахунок не виконується.';
+        rule3='Франшиза не застосовується, якщо подія не підпадає під дію поліса.'; formula3='Кінцева виплата = 0'; sub3='Подія поза строком дії поліса → виплата = 0 грн'; explain3='Франшиза не впливає, бо страховий захист на дату події відсутній.'; explain4='Прийнято рішення про відмову, оскільки подія сталася поза строком дії поліса.';
+      } else if(!state.claim.coveredByRisk){
+        rule1='Тип події має входити до переліку ризиків, обраних у полісі.'; explain1='Обраний вид події не входить до покриття полісу, тому виплата не проводиться.'; note='Відмова у виплаті: подія не входить до переліку покритих ризиків.'; statusText='Відмова'; statusClass='denied';
+        formula2='Базова виплата не визначається'; sub2='Ризик не покрито → базова виплата = 0 грн'; explain2='Фінансовий розрахунок не проводиться.';
+        rule3='Франшиза не аналізується, якщо ризик не покривається.'; formula3='Кінцева виплата = 0'; sub3='Ризик не покрито → виплата = 0 грн'; explain3='Франшиза не має значення, оскільки сам ризик не підлягає відшкодуванню.'; explain4='Прийнято рішення про відмову, оскільки подія не входить до переліку покриття.';
       } else {
-        rule1 = 'Якщо тип події входить до переліку обраних ризиків, справа переходить до фінансового розрахунку.';
-        explain1 = 'Подія входить до страхового покриття, тому система переходить до визначення суми виплати.';
-
+        rule1='Подія повинна бути покритим ризиком і відбутися в межах строку дії поліса.'; explain1='Обидві умови виконані: подія покривається полісом і сталася в період його дії.';
         baseIndemnity = Math.min(state.claim.damageAmount, state.policy.insuredSum);
         sub2 = `Базова виплата = min(${money(state.claim.damageAmount)}; ${money(state.policy.insuredSum)}) = ${money(baseIndemnity)} грн`;
-        explain2 = state.claim.damageAmount > state.policy.insuredSum
-          ? 'Оскільки збиток перевищує страхову суму, базова виплата обмежується страховою сумою.'
-          : 'Оскільки збиток не перевищує страхову суму, до базової виплати береться повний розмір збитку.';
-
-        const fr = applyFranchise(
-          baseIndemnity,
-          state.claim.damageAmount,
-          state.policy.franchiseType,
-          state.policy.franchiseValue
-        );
-
-        finalIndemnity = fr.finalValue;
-        appliedFranchise = fr.applied;
-        note = fr.explanation;
-        rule3 = fr.rule;
-        formula3 = fr.formula;
-        sub3 = fr.substitution;
-        explain3 = fr.explanation;
-
-        if (finalIndemnity === 0) {
-          statusText = 'Відмова / 0 грн';
-          statusClass = 'warning';
-        } else if (finalIndemnity < state.claim.damageAmount) {
-          statusText = 'Часткова виплата';
-          statusClass = 'warning';
-        } else {
-          statusText = 'До виплати';
-          statusClass = 'active';
-        }
-
-        explain4 = finalIndemnity === 0
-          ? 'Кінцева виплата дорівнює нулю. Причина: франшиза або правила покриття зводять виплату до 0 грн.'
-          : `Кінцева страхова виплата становить ${money(finalIndemnity)} грн. Статус справи: ${statusText}.`;
+        explain2 = state.claim.damageAmount > state.policy.insuredSum ? 'Оскільки збиток перевищує страхову суму, базова виплата обмежується страховою сумою.' : 'Оскільки збиток не перевищує страхову суму, до базової виплати береться повний розмір збитку.';
+        const fr = applyFranchise(baseIndemnity, state.claim.damageAmount, state.policy.franchiseType, state.policy.franchiseValue);
+        finalIndemnity = fr.finalValue; appliedFranchise = fr.applied; note = fr.explanation; rule3 = fr.rule; formula3 = fr.formula; sub3 = fr.substitution; explain3 = fr.explanation;
+        if(finalIndemnity === 0){ statusText='Відмова / 0 грн'; statusClass='warning'; }
+        else if(finalIndemnity < state.claim.damageAmount){ statusText='Часткова виплата'; statusClass='warning'; }
+        else { statusText='До виплати'; statusClass='active'; }
+        explain4 = finalIndemnity === 0 ? 'Кінцева виплата дорівнює нулю. Причина: франшиза або правила продукту зводять виплату до 0 грн.' : `Кінцева страхова виплата становить ${money(finalIndemnity)} грн. Статус справи: ${statusText}.`;
       }
-
-      state.decision = {
-        baseIndemnity,
-        finalIndemnity,
-        appliedFranchise,
-        note,
-        statusText
-      };
-
-      document.getElementById('baseIndemnityValue').textContent = money(baseIndemnity) + ' грн';
-      document.getElementById('appliedFranchiseValue').textContent = money(appliedFranchise) + ' грн';
-      document.getElementById('finalIndemnityValue').textContent = money(finalIndemnity) + ' грн';
-
-      document.getElementById('decisionSummary').textContent =
-        finalIndemnity > 0
-          ? `До виплати: ${money(finalIndemnity)} грн`
-          : 'Виплата відсутня';
-
-      const badge = document.getElementById('decisionStatus');
-      badge.className = 'status ' + statusClass;
-      badge.textContent = statusText;
-
+      state.decision = { baseIndemnity, finalIndemnity, appliedFranchise, note, statusText };
+      document.getElementById('baseIndemnityValue').textContent = money(baseIndemnity)+' грн';
+      document.getElementById('appliedFranchiseValue').textContent = money(appliedFranchise)+' грн';
+      document.getElementById('finalIndemnityValue').textContent = money(finalIndemnity)+' грн';
+      document.getElementById('decisionSummary').textContent = finalIndemnity > 0 ? `До виплати: ${money(finalIndemnity)} грн` : 'Виплата відсутня';
+      const badge=document.getElementById('decisionStatus'); badge.className='status '+statusClass; badge.textContent=statusText;
       document.getElementById('decisionNote').textContent = note;
-
-      document.getElementById('logicRule1').textContent = rule1;
-      document.getElementById('logicExplain1').textContent = explain1;
-
-      document.getElementById('logicRule2').textContent = rule2;
-      document.getElementById('logicFormula2').textContent = formula2;
-      document.getElementById('logicSub2').textContent = sub2;
-      document.getElementById('logicExplain2').textContent = explain2;
-
-      document.getElementById('logicRule3').textContent = rule3;
-      document.getElementById('logicFormula3').textContent = formula3;
-      document.getElementById('logicSub3').textContent = sub3;
-      document.getElementById('logicExplain3').textContent = explain3;
-
+      document.getElementById('logicRule1').textContent = rule1; document.getElementById('logicExplain1').textContent = explain1;
+      document.getElementById('logicRule2').textContent = rule2; document.getElementById('logicFormula2').textContent = formula2; document.getElementById('logicSub2').textContent = sub2; document.getElementById('logicExplain2').textContent = explain2;
+      document.getElementById('logicRule3').textContent = rule3; document.getElementById('logicFormula3').textContent = formula3; document.getElementById('logicSub3').textContent = sub3; document.getElementById('logicExplain3').textContent = explain3;
       document.getElementById('logicExplain4').textContent = explain4;
     }
 
-    function toggleExplanation() {
-      document.getElementById('decisionSteps').classList.toggle('hidden');
-    }
+    function toggleExplanation(){ document.getElementById('decisionSteps').classList.toggle('hidden'); }
 
-    function resetPolicyForm() {
+    function resetPolicyForm(){
       clearInvalids();
-      document.getElementById('clientName').value = '';
-      document.getElementById('clientType').value = 'Фізична особа';
-      document.getElementById('carBrand').selectedIndex = 0;
-      updateModelOptions();
-      document.getElementById('carYear').value = '2022';
-      document.getElementById('riskDtp').checked = true;
-      document.getElementById('riskNature').checked = false;
-      document.getElementById('riskTheft').checked = false;
-      document.getElementById('franchiseType').value = 'none';
-      document.getElementById('franchiseValue').value = '0';
-      document.getElementById('discount').value = '0';
-      document.getElementById('bonusMalus').value = '1';
-
-      state.policy = null;
-
-      hideWarning('policyWarning');
-      document.getElementById('policyStatus').className = 'status draft';
-      document.getElementById('policyStatus').textContent = 'Чернетка';
-      document.getElementById('policyPreviewStatus').className = 'status draft';
-      document.getElementById('policyPreviewStatus').textContent = 'Чернетка';
-
-      updateCarDerivedFields();
-      updatePolicyPreview();
+      document.getElementById('clientName').value=''; document.getElementById('clientType').value='Фізична особа'; document.getElementById('driverAge').value='35';
+      document.getElementById('carBrand').selectedIndex=0; updateModelOptions(); document.getElementById('carYear').value='2022'; document.getElementById('plateNumber').value='';
+      document.getElementById('cityReg').value='Київ'; document.getElementById('isCredit').checked=false; document.getElementById('isTaxi').checked=false;
+      document.getElementById('policyStart').value=todayISO(); document.getElementById('policyTerm').value='12'; updatePolicyDates();
+      document.getElementById('riskDtp').checked=true; document.getElementById('riskNature').checked=false; document.getElementById('riskTheft').checked=false;
+      document.getElementById('franchiseType').value='none'; document.getElementById('franchiseValue').value='0'; document.getElementById('discount').value='0'; document.getElementById('insuranceHistory').value='Новий клієнт';
+      state.policy=null; hideWarning('policyWarning'); document.getElementById('policyStatus').className='status draft'; document.getElementById('policyStatus').textContent='Чернетка'; document.getElementById('policyPreviewStatus').className='status draft'; document.getElementById('policyPreviewStatus').textContent='Чернетка';
+      updateCarDerivedFields(); updatePolicyPreview();
     }
+    function resetClaimForm(){ clearInvalids(); document.getElementById('claimDate').value=''; document.getElementById('claimType').value='ДТП'; document.getElementById('damageAmount').value=''; document.getElementById('claimDescription').value=''; hideWarning('claimWarning'); document.getElementById('claimResultBox').classList.add('hidden'); document.getElementById('claimStateBadge').className='status draft'; document.getElementById('claimStateBadge').textContent='Очікує введення'; state.claim=null; }
+    function resetDecisionScreen(){ hideWarning('decisionWarning'); document.getElementById('baseIndemnityValue').textContent='—'; document.getElementById('appliedFranchiseValue').textContent='—'; document.getElementById('finalIndemnityValue').textContent='—'; document.getElementById('decisionSummary').textContent='—'; document.getElementById('decisionPolicyNumber').textContent='—'; document.getElementById('decisionRisk').textContent='—'; document.getElementById('decisionNote').textContent='—'; document.getElementById('decisionStatus').className='status draft'; document.getElementById('decisionStatus').textContent='Очікує розрахунку'; document.getElementById('decisionSteps').classList.add('hidden'); ['logicRule1','logicExplain1','logicRule2','logicFormula2','logicSub2','logicExplain2','logicRule3','logicFormula3','logicSub3','logicExplain3','logicExplain4'].forEach(id=>{ document.getElementById(id).textContent='—'; }); state.decision=null; }
+    function resetAllWorkflow(){ state.policy=null; state.claim=null; state.decision=null; resetPolicyForm(); resetClaimForm(); resetDecisionScreen(); switchScreen('policyScreen'); }
+    function fillDemo(){ document.getElementById('clientName').value='Віктор Пиріг'; document.getElementById('clientType').value='Фізична особа'; document.getElementById('driverAge').value='24'; document.getElementById('carBrand').value='Toyota'; updateModelOptions(); document.getElementById('carModel').value='Camry'; document.getElementById('carYear').value='2021'; document.getElementById('plateNumber').value='AA1234BC'; document.getElementById('cityReg').value='Київ'; document.getElementById('isCredit').checked=true; document.getElementById('isTaxi').checked=false; document.getElementById('policyStart').value=todayISO(); document.getElementById('policyTerm').value='12'; updatePolicyDates(); document.getElementById('riskDtp').checked=true; document.getElementById('riskNature').checked=true; document.getElementById('riskTheft').checked=false; document.getElementById('franchiseType').value='unconditional'; document.getElementById('franchiseValue').value='30 000'; document.getElementById('discount').value='10'; document.getElementById('insuranceHistory').value='1 ДТП у попередньому періоді'; updateCarDerivedFields(); updatePolicyPreview(); }
 
-    function resetClaimForm() {
-      clearInvalids();
-      document.getElementById('claimDate').value = '';
-      document.getElementById('claimType').value = 'ДТП';
-      document.getElementById('damageAmount').value = '';
-      document.getElementById('claimDescription').value = '';
-      hideWarning('claimWarning');
-      document.getElementById('claimResultBox').classList.add('hidden');
-      document.getElementById('claimStateBadge').className = 'status draft';
-      document.getElementById('claimStateBadge').textContent = 'Очікує введення';
-      state.claim = null;
-    }
-
-    function resetDecisionScreen() {
-      hideWarning('decisionWarning');
-      document.getElementById('baseIndemnityValue').textContent = '—';
-      document.getElementById('appliedFranchiseValue').textContent = '—';
-      document.getElementById('finalIndemnityValue').textContent = '—';
-      document.getElementById('decisionSummary').textContent = '—';
-      document.getElementById('decisionRisk').textContent = '—';
-      document.getElementById('decisionPolicyNumber').textContent = '—';
-      document.getElementById('decisionNote').textContent = '—';
-      document.getElementById('decisionStatus').className = 'status draft';
-      document.getElementById('decisionStatus').textContent = 'Очікує розрахунку';
-      document.getElementById('decisionSteps').classList.add('hidden');
-      ['logicRule1','logicExplain1','logicRule2','logicFormula2','logicSub2','logicExplain2','logicRule3','logicFormula3','logicSub3','logicExplain3','logicExplain4'].forEach(id=>{
-        document.getElementById(id).textContent='—';
-      });
-      state.decision = null;
-    }
-
-    function resetAllWorkflow() {
-      state.policy = null;
-      state.claim = null;
-      state.decision = null;
-      resetPolicyForm();
-      resetClaimForm();
-      resetDecisionScreen();
-      switchScreen('policyScreen');
-    }
-
-    // bindings
     document.getElementById('carBrand').addEventListener('change', updateModelOptions);
     document.getElementById('carModel').addEventListener('change', updateCarDerivedFields);
     document.getElementById('carYear').addEventListener('input', updateCarDerivedFields);
-    ['clientName','clientType','marketValue','insuredSum','franchiseType','franchiseValue','discount','bonusMalus'].forEach(id => {
-      document.getElementById(id).addEventListener('input', updatePolicyPreview);
-      document.getElementById(id).addEventListener('change', updatePolicyPreview);
-    });
-    ['riskDtp','riskNature','riskTheft'].forEach(id => {
-      document.getElementById(id).addEventListener('change', updatePolicyPreview);
-    });
+    document.getElementById('policyStart').addEventListener('change', updatePolicyDates);
+    document.getElementById('policyTerm').addEventListener('change', updatePolicyDates);
+    ['clientName','clientType','driverAge','plateNumber','cityReg','marketValue','insuredSum','franchiseType','franchiseValue','discount','insuranceHistory'].forEach(id=>{ document.getElementById(id).addEventListener('input', updatePolicyPreview); document.getElementById(id).addEventListener('change', updatePolicyPreview); });
+    ['riskDtp','riskNature','riskTheft','isCredit','isTaxi'].forEach(id=>{ document.getElementById(id).addEventListener('change', updatePolicyPreview); });
 
+    ['marketValue','insuredSum','franchiseValue','damageAmount'].forEach(attachMoneyFormatting);
+
+    initHistorySelect();
     initCarSelectors();
+    document.getElementById('policyStart').value = todayISO();
+    updatePolicyDates();
     updatePolicyPreview();
   </script>
 </body>
