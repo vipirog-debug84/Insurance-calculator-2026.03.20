@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Медичне страхування — резерв і страховий платіж</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#f4f7fb; --text:#13233f; --muted:#64748b; --line:#d8e1ee;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --shadow:0 16px 36px rgba(15,23,42,.08);
+      --successSoft:#eafcf0;
+    }
+    body{
+      margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text); line-height:1.45;
+      background:
+        radial-gradient(circle at top right, rgba(124,58,237,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 24%),
+        var(--bg);
+    }
+    .app{max-width:1380px; margin:0 auto; padding:18px;}
+    .topbar{
+      background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#7c3aed 100%);
+      color:#fff; border-radius:26px; box-shadow:var(--shadow);
+      padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap;
+    }
+    .topbar h1{margin:0; font-size:30px;}
+    .topbar .sub{margin-top:6px; font-size:14px; color:rgba(255,255,255,.92); max-width:900px;}
+    .pill{
+      display:inline-flex; align-items:center; padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.18); font-weight:800;
+    }
+    .layout{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .section{
+      background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:18px; margin-bottom:18px;
+    }
+    .form{background:linear-gradient(180deg,#f6f9ff,#fbfcff);}
+    .result{background:linear-gradient(180deg,#fcfffd,#ffffff);}
+    h2{margin:0 0 6px; font-size:26px; color:#0f172a;}
+    h3{margin:0 0 12px; font-size:18px; color:#1e3a8a;}
+    .muted{color:var(--muted); font-size:14px;}
+    .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+    label{display:block; margin-bottom:6px; font-size:14px; font-weight:800; color:#22314f;}
+    input, select{
+      width:100%; padding:13px 14px; border-radius:14px; border:1px solid var(--line); font-size:15px; background:#fff; color:var(--text);
+    }
+    input:focus,select:focus{outline:none; border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+    input.invalid, select.invalid{border-color:#ef4444; box-shadow:0 0 0 4px rgba(239,68,68,.10); background:#fffafa;}
+    .hint{
+      margin-top:6px; font-size:13px; color:#475569; background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;}
+    .btn{border:none; border-radius:16px; padding:13px 18px; font-size:15px; font-weight:800; cursor:pointer;}
+    .btn.primary{color:#fff; background:linear-gradient(135deg,var(--primary),var(--primary2)); box-shadow:0 12px 24px rgba(37,99,235,.22);}
+    .btn.secondary{background:#e8edf6; color:var(--text);}
+    .btn.ghost{background:#eef4ff; color:var(--primary);}
+    .warning-box{
+      display:none; margin-top:14px; padding:13px 14px; border-radius:14px; background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-weight:800;
+    }
+    .status{
+      display:inline-flex; align-items:center; padding:9px 13px; border-radius:999px; font-size:13px; font-weight:800; border:1px solid transparent; white-space:nowrap;
+    }
+    .status.draft{background:#edf2f7; color:#475569;}
+    .status.active{background:var(--successSoft); color:var(--success); border-color:#bbf7d0;}
+    .metric-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:16px;}
+    .metric{
+      border-radius:18px; padding:16px; border:1px solid #dfe7f4; background:#fff; box-shadow:0 8px 18px rgba(15,23,42,.04);
+    }
+    .metric.blue{background:linear-gradient(180deg,#eff6ff,#ffffff);}
+    .metric.orange{background:linear-gradient(180deg,#fff7ed,#ffffff);}
+    .metric.green{background:linear-gradient(180deg,#ecfdf5,#ffffff);}
+    .metric.purple{background:linear-gradient(180deg,#f3e8ff,#ffffff);}
+    .metric .title{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800;}
+    .metric .value{margin-top:8px; font-size:28px; font-weight:900; color:#0f172a;}
+    table.kv{width:100%; border-collapse:collapse;}
+    .kv td{border:1px solid #d8e0ee; padding:10px; vertical-align:top; font-size:14px;}
+    .kv td:first-child{width:45%; font-weight:800; background:#f0f6ff;}
+    .logic-steps{display:grid; gap:14px; margin-top:18px;}
+    .step{border-radius:16px; background:#fff; border:1px solid #e2e8f0; overflow:hidden;}
+    .step-head{
+      display:flex; align-items:center; gap:12px; padding:12px 14px; background:linear-gradient(180deg,#f8fbff,#fcfdff); border-bottom:1px solid #e5ebf5;
+    }
+    .step-num{
+      width:34px; height:34px; flex:0 0 34px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff;
+      display:flex; align-items:center; justify-content:center; font-weight:900;
+    }
+    .step-title{font-size:16px; font-weight:900; color:#13254a;}
+    .step-body{padding:14px;}
+    .logic-label{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:900; margin-bottom:6px;}
+    .formula-box{
+      background:#f8fbff; border:1px solid #cfe0ff; border-left:6px solid var(--primary); border-radius:14px; padding:14px; white-space:pre-line; color:#163056;
+    }
+    .mistakes{
+      background:#fff8f1; border:1px solid #fed7aa; border-radius:18px; padding:16px; margin-top:18px;
+    }
+    .mistakes h3{color:#9a3412}
+    .mistakes ul{margin:8px 0 0 18px; padding:0;}
+    .mistakes li{margin:8px 0; color:#7c2d12;}
+    .scenario-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px;}
+    .scenario-card{border:1px solid #d8e1ee; border-radius:18px; overflow:hidden; background:#fff; box-shadow:0 8px 18px rgba(15,23,42,.04);}
+    .scenario-visual{height:110px; display:flex; align-items:center; justify-content:center; font-size:46px; color:#fff; font-weight:700;}
+    .sv-hospital{background:linear-gradient(135deg,#2563eb,#7c3aed);}
+    .sv-budget{background:linear-gradient(135deg,#10b981,#059669);}
+    .sv-insurance{background:linear-gradient(135deg,#f59e0b,#ea580c);}
+    .scenario-body{padding:14px;}
+    .scenario-body h4{margin:0 0 8px; font-size:17px; color:#0f172a;}
+    .scenario-body p{margin:4px 0; font-size:14px; color:#475569;}
+    @media (max-width:1100px){
+      .layout,.grid-2,.metric-grid,.scenario-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Медичне страхування</h1>
+        <div class="sub">Модуль для розрахунку страхового резерву, нетто-платежу та брутто-платежу.</div>
+      </div>
+      <div class="pill">Розрахунковий модуль</div>
+    </div>
+
+    <section class="section">
+      <h2>Схема розрахунку</h2>
+      <div class="muted">Від загальної вартості лікування до брутто-платежу.</div>
+      <div class="scenario-grid">
+        <div class="scenario-card">
+          <div class="scenario-visual sv-hospital">🏥</div>
+          <div class="scenario-body">
+            <h4>1. Лікування хворих</h4>
+            <p>Спочатку визначається загальна вартість лікування всіх хворих за рік.</p>
+            <p><strong>Формула:</strong> вартість 1 лікування × кількість хворих.</p>
+          </div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-visual sv-budget">🏛️</div>
+          <div class="scenario-body">
+            <h4>2. Частину покриває бюджет</h4>
+            <p>Із загальних витрат відокремлюється частка, яка фінансується бюджетом.</p>
+            <p><strong>Результат:</strong> після цього лишається сума страхового резерву.</p>
+          </div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-visual sv-insurance">🛡️</div>
+          <div class="scenario-body">
+            <h4>3. Решту покриває страхування</h4>
+            <p>Страховий резерв ділиться на всіх страхувальників, а потім додається навантаження.</p>
+            <p><strong>Результат:</strong> нетто- і брутто-платіж на 1 особу.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="section form">
+        <h2>Вхідні дані</h2>
+        <div class="muted">Введіть вихідні параметри для розрахунку.</div>
+
+        <div style="margin-top:18px;">
+          <h3>Параметри задачі</h3>
+          <div class="grid-2">
+            <div>
+              <label for="treatmentCost">Вартість лікування одного хворого, грн</label>
+              <input id="treatmentCost" type="text" inputmode="numeric" placeholder="Наприклад: 5 000">
+              <div class="hint">Рекомендований навчальний діапазон: від 100 грн до 1 000 000 грн.</div>
+            </div>
+            <div>
+              <label for="patientsCount">Кількість хворих за рік</label>
+              <input id="patientsCount" type="text" inputmode="numeric" placeholder="Наприклад: 3 000">
+              <div class="hint">Рекомендований навчальний діапазон: від 1 до 100 000 осіб.</div>
+            </div>
+            <div>
+              <label for="budgetShare">Бюджетне асигнування, %</label>
+              <input id="budgetShare" type="number" min="0" max="90" step="0.01" placeholder="Наприклад: 40">
+              <div class="hint">Рекомендований навчальний діапазон: від 0% до 90%.</div>
+            </div>
+            <div>
+              <label for="insuredCount">Кількість страхувальників</label>
+              <input id="insuredCount" type="text" inputmode="numeric" placeholder="Наприклад: 10 000">
+              <div class="hint">Рекомендований навчальний діапазон: від 1 до 1 000 000 осіб.</div>
+            </div>
+            <div>
+              <label for="loadingPercent">Навантаження, %</label>
+              <input id="loadingPercent" type="number" min="0" max="40" step="0.01" placeholder="Наприклад: 20">
+              <div class="hint">Рекомендований навчальний діапазон: від 0% до 40%.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="calculateMedical()">Розрахувати</button>
+          <button class="btn secondary" onclick="resetModule()">Очистити</button>
+          <button class="btn ghost" onclick="fillExample()">Заповнити приклад</button>
+        </div>
+
+        <div id="formWarning" class="warning-box"></div>
+
+        <div class="mistakes">
+          <h3>Типові помилки</h3>
+          <ul>
+            <li>Не віднімати бюджетне покриття при визначенні страхового резерву.</li>
+            <li>Рахувати навантаження не від нетто-платежу, а від резерву чи загальних витрат.</li>
+            <li>Ділити резерв не на кількість страхувальників, а на кількість хворих.</li>
+            <li>Плутати страховий резерв, нетто-платіж і брутто-платіж.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section result">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+          <div>
+            <h2>Результат</h2>
+            <div class="muted">Покроково: загальні витрати → бюджетне покриття → резерв → нетто-платіж → брутто-платіж.</div>
+          </div>
+          <div id="resultStatus" class="status draft">Очікує розрахунку</div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric blue">
+            <div class="title">Загальна вартість лікування</div>
+            <div class="value" id="totalTreatmentView">—</div>
+          </div>
+          <div class="metric orange">
+            <div class="title">Бюджетне покриття</div>
+            <div class="value" id="budgetCoverageView">—</div>
+          </div>
+          <div class="metric green">
+            <div class="title">Страховий резерв</div>
+            <div class="value" id="reserveView">—</div>
+          </div>
+          <div class="metric purple">
+            <div class="title">Брутто-платіж на 1 особу</div>
+            <div class="value" id="grossPaymentView">—</div>
+          </div>
+        </div>
+
+        <table class="kv">
+          <tr><td>Нетто-платіж на 1 страхувальника</td><td id="netPaymentView">—</td></tr>
+          <tr><td>Навантаження на 1 страхувальника</td><td id="loadingAmountView">—</td></tr>
+          <tr><td>Висновок</td><td id="conclusionView">—</td></tr>
+          <tr><td>Пояснення</td><td id="decisionNoteView">—</td></tr>
+        </table>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Хід розрахунку</h2>
+      <div class="logic-steps">
+        <div class="step">
+          <div class="step-head"><div class="step-num">1</div><div class="step-title">Загальна вартість лікування</div></div>
+          <div class="step-body">
+            <div class="logic-label">Підстановка</div>
+            <div class="formula-box" id="logicStep1">—</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><div class="step-num">2</div><div class="step-title">Бюджетне покриття та страховий резерв</div></div>
+          <div class="step-body">
+            <div class="logic-label">Підстановка</div>
+            <div class="formula-box" id="logicStep2">—</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><div class="step-num">3</div><div class="step-title">Нетто-платіж</div></div>
+          <div class="step-body">
+            <div class="logic-label">Підстановка</div>
+            <div class="formula-box" id="logicStep3">—</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><div class="step-num">4</div><div class="step-title">Брутто-платіж</div></div>
+          <div class="step-body">
+            <div class="logic-label">Підстановка</div>
+            <div class="formula-box" id="logicStep4">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function money(v){
+      return new Intl.NumberFormat('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+    }
+
+    function parseMoneyInput(value){
+      if (typeof value !== 'string') return NaN;
+      const cleaned = value.replace(/\s+/g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+      return cleaned ? parseFloat(cleaned) : NaN;
+    }
+
+    function formatIntegerLike(value){
+      if (value === null || value === undefined) return '';
+      const digits = String(value).replace(/\D/g, '');
+      if (!digits) return '';
+      return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Number(digits));
+    }
+
+    function attachMoneyFormatting(id){
+      const el = document.getElementById(id);
+      const formatNow = () => { el.value = formatIntegerLike(el.value); };
+      el.addEventListener('input', formatNow);
+      el.addEventListener('blur', formatNow);
+    }
+
+    function showWarning(text){
+      const el = document.getElementById('formWarning');
+      el.style.display = 'block';
+      el.textContent = text;
+    }
+
+    function hideWarning(){
+      const el = document.getElementById('formWarning');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
+
+    function clearInvalids(){
+      document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
+    function markInvalid(){
+      Array.from(arguments).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('invalid');
+      });
+    }
+
+    function setStatus(cls, text){
+      const el = document.getElementById('resultStatus');
+      el.className = 'status ' + cls;
+      el.textContent = text;
+    }
+
+    function validateInputs(data){
+      clearInvalids();
+      hideWarning();
+
+      if(!isFinite(data.treatmentCost) || data.treatmentCost <= 0){
+        markInvalid('treatmentCost');
+        showWarning('Вартість лікування одного хворого має бути більшою за нуль.');
+        return false;
+      }
+      if(data.treatmentCost < 100 || data.treatmentCost > 1000000){
+        markInvalid('treatmentCost');
+        showWarning('Вартість лікування одного хворого має бути в межах від 100 грн до 1 000 000 грн.');
+        return false;
+      }
+      if(!isFinite(data.patientsCount) || data.patientsCount <= 0){
+        markInvalid('patientsCount');
+        showWarning('Кількість хворих за рік має бути більшою за нуль.');
+        return false;
+      }
+      if(data.patientsCount < 1 || data.patientsCount > 100000){
+        markInvalid('patientsCount');
+        showWarning('Кількість хворих за рік має бути в межах від 1 до 100 000.');
+        return false;
+      }
+      if(!isFinite(data.budgetShare) || data.budgetShare < 0 || data.budgetShare > 90){
+        markInvalid('budgetShare');
+        showWarning('Бюджетне асигнування має бути в межах від 0% до 90%.');
+        return false;
+      }
+      if(!isFinite(data.insuredCount) || data.insuredCount <= 0){
+        markInvalid('insuredCount');
+        showWarning('Кількість страхувальників має бути більшою за нуль.');
+        return false;
+      }
+      if(data.insuredCount < 1 || data.insuredCount > 1000000){
+        markInvalid('insuredCount');
+        showWarning('Кількість страхувальників має бути в межах від 1 до 1 000 000.');
+        return false;
+      }
+      if(!isFinite(data.loadingPercent) || data.loadingPercent < 0 || data.loadingPercent > 40){
+        markInvalid('loadingPercent');
+        showWarning('Навантаження має бути в межах від 0% до 40%.');
+        return false;
+      }
+      if(data.insuredCount < data.patientsCount){
+        markInvalid('insuredCount','patientsCount');
+        showWarning('Кількість страхувальників не може бути меншою за кількість хворих у межах цієї навчальної моделі.');
+        return false;
+      }
+      return true;
+    }
+
+    function calculateMedical(){
+      const treatmentCost = parseMoneyInput(document.getElementById('treatmentCost').value);
+      const patientsCount = parseMoneyInput(document.getElementById('patientsCount').value);
+      const budgetShare = parseFloat(document.getElementById('budgetShare').value);
+      const insuredCount = parseMoneyInput(document.getElementById('insuredCount').value);
+      const loadingPercent = parseFloat(document.getElementById('loadingPercent').value);
+
+      const data = {treatmentCost, patientsCount, budgetShare, insuredCount, loadingPercent};
+      if(!validateInputs(data)) return;
+
+      const totalTreatment = treatmentCost * patientsCount;
+      const budgetCoverage = totalTreatment * (budgetShare / 100);
+      const reserve = totalTreatment - budgetCoverage;
+      const netPayment = reserve / insuredCount;
+      const loadingAmount = netPayment * (loadingPercent / 100);
+      const grossPayment = netPayment + loadingAmount;
+
+      document.getElementById('totalTreatmentView').textContent = money(totalTreatment) + ' грн';
+      document.getElementById('budgetCoverageView').textContent = money(budgetCoverage) + ' грн';
+      document.getElementById('reserveView').textContent = money(reserve) + ' грн';
+      document.getElementById('grossPaymentView').textContent = money(grossPayment) + ' грн';
+      document.getElementById('netPaymentView').textContent = money(netPayment) + ' грн';
+      document.getElementById('loadingAmountView').textContent = money(loadingAmount) + ' грн';
+      document.getElementById('conclusionView').textContent =
+        `Для покриття витрат на лікування після бюджетного фінансування необхідно сформувати страховий резерв у сумі ${money(reserve)} грн. Нетто-платіж на одного страхувальника становить ${money(netPayment)} грн, а брутто-платіж з урахуванням навантаження — ${money(grossPayment)} грн.`;
+      document.getElementById('decisionNoteView').textContent =
+        'Спочатку визначено загальну вартість лікування, потім віднято бюджетне покриття, далі страховий резерв поділено на кількість страхувальників і до нетто-платежу додано навантаження.';
+
+      document.getElementById('logicStep1').textContent =
+        `${money(treatmentCost)} × ${money(patientsCount)} = ${money(totalTreatment)} грн`;
+
+      document.getElementById('logicStep2').textContent =
+        `Бюджетне покриття:
+${money(totalTreatment)} × ${money(budgetShare)}% = ${money(budgetCoverage)} грн
+
+` +
+        `Страховий резерв:
+${money(totalTreatment)} − ${money(budgetCoverage)} = ${money(reserve)} грн`;
+
+      document.getElementById('logicStep3').textContent =
+        `${money(reserve)} / ${money(insuredCount)} = ${money(netPayment)} грн`;
+
+      document.getElementById('logicStep4').textContent =
+        `Навантаження:
+${money(netPayment)} × ${money(loadingPercent)}% = ${money(loadingAmount)} грн
+
+` +
+        `Брутто-платіж:
+${money(netPayment)} + ${money(loadingAmount)} = ${money(grossPayment)} грн`;
+
+      setStatus('active', 'Розраховано');
+    }
+
+    function fillExample(){
+      document.getElementById('treatmentCost').value = '5 000';
+      document.getElementById('patientsCount').value = '3 000';
+      document.getElementById('budgetShare').value = '40';
+      document.getElementById('insuredCount').value = '10 000';
+      document.getElementById('loadingPercent').value = '20';
+      hideWarning();
+      clearInvalids();
+    }
+
+    function resetModule(){
+      clearInvalids();
+      hideWarning();
+      document.getElementById('treatmentCost').value = '';
+      document.getElementById('patientsCount').value = '';
+      document.getElementById('budgetShare').value = '';
+      document.getElementById('insuredCount').value = '';
+      document.getElementById('loadingPercent').value = '';
+
+      ['totalTreatmentView','budgetCoverageView','reserveView','grossPaymentView',
+       'netPaymentView','loadingAmountView','conclusionView','decisionNoteView',
+       'logicStep1','logicStep2','logicStep3','logicStep4'
+      ].forEach(id => document.getElementById(id).textContent = '—');
+
+      setStatus('draft', 'Очікує розрахунку');
+    }
+
+    ['treatmentCost','patientsCount','insuredCount'].forEach(attachMoneyFormatting);
+  </script>
+</body>
+</html>
